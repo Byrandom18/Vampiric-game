@@ -1,0 +1,128 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+using System.Collections;
+
+public class PlayerMovement : MonoBehaviour
+{
+    private Rigidbody2D rb;
+    [SerializeField] private float speed = 3f;
+    private SpriteRenderer sprite;
+    private InputSystem_Actions inputActions;
+    private PlayerStats stats;
+
+    public static PlayerMovement Instance { get; private set; }
+
+    [Header("Dodge Settings")]
+    [SerializeField] private float dodgePower = 10f; // Сила рывка
+    [SerializeField] private float dodgeDuration = 0.2f;
+    [SerializeField] private float cooldown = 5f;
+    
+    private bool isDodging = false;
+    private bool canDodge = true;
+    private Vector2 lastMovementDirection = Vector2.right;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        sprite = GetComponent<SpriteRenderer>();
+        Instance = this;
+        stats = GetComponent<PlayerStats>();
+    }
+
+    private void Start()
+    {
+        inputActions = new InputSystem_Actions();
+        inputActions.Enable();
+        inputActions.Player.Dodge.performed += OnDodgeInput;
+    }
+
+    private void Update()
+    {
+        if (!isDodging)
+        {
+            Move();
+            UpdateSpriteDirection();
+        }
+    }
+
+    private void Move()
+    {
+        Vector2 inputVector = GetMovementVector();
+
+        if (inputVector != Vector2.zero)
+        {
+            lastMovementDirection = inputVector;
+        }
+
+        rb.linearVelocity = inputVector * speed;
+    }
+
+    private void UpdateSpriteDirection()
+    {
+        if (rb.linearVelocity.x < -0.1f)
+        {
+            sprite.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else if (rb.linearVelocity.x > 0.1f)
+        {
+            sprite.transform.localScale = new Vector3(1, 1, 1);
+        }
+    }
+
+    private Vector2 GetMovementVector()
+    {
+        return inputActions.Player.Move.ReadValue<Vector2>();
+    }
+
+    private void OnDodgeInput(InputAction.CallbackContext context)
+    {
+        if (canDodge && !isDodging)
+        {
+            StartCoroutine(PerformDodge());
+        }
+    }
+    
+    private IEnumerator PerformDodge()
+    {
+        // Подготовка
+        canDodge = false;
+        isDodging = true;
+        stats.invulnerability = true;
+        // Определяем направление
+        Vector2 dodgeDirection = GetMovementVector();
+        if (dodgeDirection == Vector2.zero)
+        {
+            dodgeDirection = lastMovementDirection;
+        }
+
+
+        // Применяем рывок через velocity
+        rb.linearVelocity = dodgeDirection * dodgePower;
+
+        // Ждем duration
+        yield return new WaitForSeconds(dodgeDuration);
+        
+        // Возвращаем обычную скорость (если игрок держит кнопку движения)
+        if (!isDodging) // Дополнительная проверка на случай прерывания
+        {
+            rb.linearVelocity = GetMovementVector() * speed;
+        }
+
+        // Завершение
+        isDodging = false;
+        stats.invulnerability = false;
+        // Перезарядка
+        yield return new WaitForSeconds(cooldown);
+        canDodge = true;
+        
+    }
+
+    private void OnDisable()
+    {
+        if (inputActions != null)
+        {
+            inputActions.Player.Dodge.performed -= OnDodgeInput;
+            inputActions.Disable();
+        }
+    }
+}
