@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CollectibleItem : MonoBehaviour
 {
-    public enum ItemType { Exp, Gold, Magnet, Equipment }
+    public enum ItemType { Exp, Gold, Magnet, Heart, Equipment }
     public ItemType itemType;
 
     [Header("Value Settings")]
@@ -63,6 +63,9 @@ public class CollectibleItem : MonoBehaviour
             case ItemType.Magnet:
                 MagnetActivation();
                 break;
+            case ItemType.Heart:
+                HeartHeal();
+                break;
             case ItemType.Equipment:
                 //PlayerStats.Instance.AddEquipment(equipment);
                 break;
@@ -92,4 +95,10 @@ public class CollectibleItem : MonoBehaviour
             item.ForceAttract();
         }
     }
+
+    public void HeartHeal()
+    {
+        PlayerStats.Instance.AddHealth();
+    }
+
 }

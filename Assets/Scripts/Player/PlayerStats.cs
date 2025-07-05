@@ -70,5 +70,11 @@ public class PlayerStats : MonoBehaviour
         gold += value;
         Debug.Log("gold = " + gold);
     }
-
+    public void AddHealth()
+    {
+        health += maxHealth / 10;
+        if (health > maxHealth)
+            health = maxHealth;
+        BarsUpdate();
+    }
 }

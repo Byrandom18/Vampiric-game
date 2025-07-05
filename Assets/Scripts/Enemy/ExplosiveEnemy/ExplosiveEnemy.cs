@@ -3,8 +3,15 @@ using UnityEngine;
 public class ExplosiveEnemy : MonoBehaviour
 {
     public Explosion explosionPrefab;
+    private EnemyDamage enemyDamage;
+    [SerializeField] private float explosionRadius = 1f;
+    [SerializeField] private float explosionTime = 0.3f;
 
 
+    private void Start()
+    {
+        enemyDamage = GetComponent<EnemyDamage>();
+    }
 
 
 
@@ -20,8 +27,8 @@ public class ExplosiveEnemy : MonoBehaviour
         Explosion explosion = Instantiate(explosionPrefab, position, Quaternion.identity);
 
         // Можно настроить параметры взрыва:
-        explosion.maxRadius = 3f;
-        explosion.fillTime = 0.3f;
-        explosion.damage = 15f;
+        explosion.maxRadius = explosionRadius;
+        explosion.fillTime = explosionTime;
+        explosion.damage = enemyDamage.damage;
     }
 }
