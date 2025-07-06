@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CollectibleItem : MonoBehaviour
 {
-    public enum ItemType { Exp, Gold, Magnet, Heart, Equipment }
+    public enum ItemType { Exp, Gold, Magnet, Heart, Bomb, Equipment }
     public ItemType itemType;
 
     [Header("Value Settings")]
@@ -11,7 +11,11 @@ public class CollectibleItem : MonoBehaviour
 
     [Header("Movement Settings")]
     public float attractionRadius = 2f;
-    public float speed = 12f;
+    public float speed = 8f;
+
+    [Header("Bomb Settings")]
+    [SerializeField] private float explosionRadius = 5;
+    [SerializeField] private float bombDamageMod = 5;
 
     private Transform player;
     private bool isAttracted = false;
@@ -66,6 +70,9 @@ public class CollectibleItem : MonoBehaviour
             case ItemType.Heart:
                 HeartHeal();
                 break;
+            case ItemType.Bomb:
+                Explode();
+                break;
             case ItemType.Equipment:
                 //PlayerStats.Instance.AddEquipment(equipment);
                 break;
@@ -93,6 +100,7 @@ public class CollectibleItem : MonoBehaviour
         foreach (var item in items)
         {
             item.ForceAttract();
+            item.speed *= 2;
         }
     }
 
@@ -100,5 +108,23 @@ public class CollectibleItem : MonoBehaviour
     {
         PlayerStats.Instance.AddHealth();
     }
+    private void Explode()
+    {
+        // 1. Находим всех врагов в радиусе
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
+            transform.position,
+            explosionRadius,
+            LayerMask.GetMask("Enemy") // Используйте слой или тег
+        );
 
+        // 2. Наносим урон каждому врагу
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            if (enemy.CompareTag("Enemy") && enemy.isTrigger)
+            {
+
+                enemy.GetComponent<EnemyDamage>().TakeDamage(PlayerStats.Instance.atk * bombDamageMod);
+            }
+        }
+    }
 }

@@ -15,10 +15,14 @@ public class EnemyClass : MonoBehaviour
     [SerializeField] private float forceDuration = 1;
     [SerializeField] private float forceCD = 5;
     [SerializeField] private float forcePower = 2;
+
+    private Vector2 originalScale;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         enemyDamage = GetComponent<EnemyDamage>();
+        originalScale = transform.localScale;
     }
 
     // Update is called once per frame
@@ -50,9 +54,9 @@ public class EnemyClass : MonoBehaviour
 
 
         if (direction.x > 0)
-            transform.localScale = new Vector3(1, 1, 1); // Смотрит вправо
+            transform.localScale = new Vector3(originalScale.x, originalScale.y, 1); // Смотрит вправо
         else if (direction.x < 0)
-            transform.localScale = new Vector3(-1, 1, 1); // Смотрит влево
+            transform.localScale = new Vector3(-originalScale.x, originalScale.y, 1); // Смотрит влево
 
 
         // перенос на противоположную часть карты если игрок далеко от моба
