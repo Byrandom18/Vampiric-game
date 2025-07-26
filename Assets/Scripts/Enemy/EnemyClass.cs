@@ -68,7 +68,7 @@ public class EnemyClass : MonoBehaviour
     private IEnumerator InsideCheck()
     {
         canHitInside = false;
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.25f);
         float distanceToPlayer = Vector2.Distance(transform.position, PlayerMovement.Instance.transform.position);
         if (distanceToPlayer < 0.2f)
             PlayerStats.Instance.TakeDamage(enemyDamage.damage);

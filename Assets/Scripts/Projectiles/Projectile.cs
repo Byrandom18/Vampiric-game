@@ -27,6 +27,11 @@ public class Projectile : MonoBehaviour
     {
         Destroy(gameObject, lifetime);
     }
+    public void SetColor(Color newColor)
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr != null) sr.color = newColor;
+    }
 
     public void SetDirection(Vector2 dir)
     {
@@ -48,10 +53,7 @@ public class Projectile : MonoBehaviour
                 }
                 Destroy(gameObject);
             }
-            else if (!collision.CompareTag("Enemy"))
-            {
-                Destroy(gameObject);
-            }
+            
         }
         if (!enemyLaunch)
         {
@@ -69,10 +71,7 @@ public class Projectile : MonoBehaviour
                 }
                 
             }
-            else if (!collision.CompareTag("Player"))
-            {
-                Destroy(gameObject);
-            }
+            
         }
 
     }

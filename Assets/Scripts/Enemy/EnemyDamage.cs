@@ -5,7 +5,9 @@ public class EnemyDamage : MonoBehaviour
 {
     public float damage = 1;
     public float health = 10;
-    
+    public float defence = 0;
+
+
     private Animator animator;
     private float shrinkDuration = 0.5f; // Длительность сжатия
 
@@ -24,6 +26,9 @@ public class EnemyDamage : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        damage -= defence;
+        if (damage < 1)
+            damage = 1;
         health -= damage;
         Debug.Log("здоровье врага: " + health);
         if (health <= 0)

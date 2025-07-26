@@ -13,7 +13,6 @@ public class PlayerStats : MonoBehaviour
     public float healthRegen;
     public float atk = 1;
     public float damageMod;
-    public float damageRed;
     public float luck;
     public float critRate;
     public float critDamage;
@@ -47,6 +46,10 @@ public class PlayerStats : MonoBehaviour
     {
         if (!invulnerability)
         {
+            damage -= def;
+            if (damage < 1)
+                damage = 1;
+
             health -= damage;
             Debug.Log(health);
             BarsUpdate();
