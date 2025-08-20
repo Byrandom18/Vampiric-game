@@ -61,22 +61,37 @@ public class ItemGenerator : MonoBehaviour
         // Базовая величина характеристики
         float baseValue = type switch
         {
-            EquipmentItem.StatType.Health => 10f,
-            EquipmentItem.StatType.HealthRegen => 1f,
-            EquipmentItem.StatType.Attack => 5f,
-            EquipmentItem.StatType.Defense => 1f,
-            EquipmentItem.StatType.CritChance => 5f,
-            EquipmentItem.StatType.CritDamage => 10f,
+            EquipmentItem.StatType.CritChance => 10,
+            EquipmentItem.StatType.CritDamage => 20,
+            EquipmentItem.StatType.AtkMod => 16,
+            EquipmentItem.StatType.HealthMod => 16,
+            EquipmentItem.StatType.Def => 2,
+            EquipmentItem.StatType.AtkFlat => 6,
+            EquipmentItem.StatType.HealthFlat => 30,
+            EquipmentItem.StatType.HealthRegen => 2,
+            EquipmentItem.StatType.ExpMod => 10,
+            EquipmentItem.StatType.GoldMod => 10,
+            EquipmentItem.StatType.ProjectileSpeed => 10,
+            EquipmentItem.StatType.Durations => 10,
+            EquipmentItem.StatType.CdRed => 5,
+            EquipmentItem.StatType.Penetration => 2,
+            EquipmentItem.StatType.Luck => 10,
+            EquipmentItem.StatType.DamageMod => 5,
+            EquipmentItem.StatType.MeleeMod => 10,
+            EquipmentItem.StatType.RangeMod => 10,
+            EquipmentItem.StatType.DemonMod => 10,
+            EquipmentItem.StatType.ExplosiveMod => 10,
+            EquipmentItem.StatType.AreaMod =>10,
             _ => 1 //с этой темой он игнорит фаталы, которые будут если не добавить стат тайп в файл эквипмент айтем
         };
 
         // Множитель редкости
         float rarityMultiplier = rarity switch
         {
-            EquipmentItem.Rarity.Rare => 1.2f,
-            EquipmentItem.Rarity.Epic => 1.5f,
-            EquipmentItem.Rarity.Legendary => 2f,
-            _ => 1f 
+            EquipmentItem.Rarity.Rare => 0.5f,
+            EquipmentItem.Rarity.Epic => 0.75f,
+            EquipmentItem.Rarity.Legendary => 1f,
+            _ => 0.5f 
         };
 
         return baseValue * rarityMultiplier;

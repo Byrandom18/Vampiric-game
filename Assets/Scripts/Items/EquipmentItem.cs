@@ -38,7 +38,26 @@ public class EquipmentItem : ScriptableObject
 
     public enum StatType
     {
-        Attack, Defense, Health, HealthRegen,
-        CritChance, CritDamage, DodgeChance, etc
+        CritChance,
+        CritDamage,
+        AtkMod,
+        HealthMod,
+        Def,
+        AtkFlat,
+        HealthFlat,
+        HealthRegen,
+        ExpMod,
+        GoldMod,
+        ProjectileSpeed,
+        Durations,
+        CdRed,
+        Penetration,
+        Luck,
+        DamageMod,
+        MeleeMod,
+        RangeMod,
+        DemonMod,
+        ExplosiveMod,
+        AreaMod
     }
 }
