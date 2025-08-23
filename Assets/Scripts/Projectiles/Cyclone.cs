@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Cyclone : MonoBehaviour
 {
-    public float speed = 8f;
+    public float speed = 2f;
     public float lifetime = 3f;
     public float damage = 1;
     private Vector2 direction;
@@ -30,7 +30,7 @@ public class Cyclone : MonoBehaviour
         rb.linearVelocity = direction * speed;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         Vector2 dir = (PlayerMovement.Instance.transform.position - transform.position).normalized;
         

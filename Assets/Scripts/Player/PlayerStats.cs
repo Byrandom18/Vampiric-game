@@ -19,11 +19,14 @@ public class PlayerStats : MonoBehaviour
     public float def;
     public float speedMod;
     public float attackSpeed;
-    public float penetrationBoost;
+    public int penetrationBoost;
     public float projectileSpeed;
     public float durations;
+    public float cdRed;
+    public int addProjectile;
+    public float areaMod;
     public bool invulnerability = false;
-
+    
 
     [Header("Вспомогательные характеристики")]
     public float maxExp;

@@ -134,12 +134,14 @@ GameObject:
   m_Component:
   - component: {fileID: 65245132}
   - component: {fileID: 65245136}
+  - component: {fileID: 65245139}
+  - component: {fileID: 65245137}
   - component: {fileID: 65245135}
   - component: {fileID: 65245134}
   - component: {fileID: 65245138}
   - component: {fileID: 65245133}
-  - component: {fileID: 65245137}
-  - component: {fileID: 65245139}
+  - component: {fileID: 65245140}
+  - component: {fileID: 65245141}
   m_Layer: 3
   m_Name: Player Sprite
   m_TagString: Player
@@ -321,9 +323,12 @@ MonoBehaviour:
   def: 0
   speedMod: 0
   attackSpeed: 0
-  penetrationBoost: 1
+  penetrationBoost: 0
   projectileSpeed: 0
   durations: 0
+  cdRed: 0
+  addProjectile: 0
+  areaMod: 0
   invulnerability: 0
   maxExp: 0
   exp: 0
@@ -379,10 +384,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 133d4f242a7372f40aa354663f7578e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectilePrefab: {fileID: 7782141019650807857, guid: 554a85c874a8f5046ac2546cd237a53a, type: 3}
+  isConeActive: 1
+  isSpreadActive: 0
+--- !u!114 &65245140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 65245131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f89d1a50073cb004896fe963f94d9a7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectilePrefab: {fileID: 4369648415283980064, guid: 9cd55d63edff18d4b89174f645ec039a, type: 3}
+  isActive: 0
   baseShootInterval: 2
-  baseProjectileSpeed: 5
-  baseProjectileLifetime: 5
+  baseSpeed: 5
+  baseLifetime: 5
+  baseDamage: 1
+  basePenetrate: 0
+  baseSize: 1
+  baseCount: 3
+  coneAngle: 30
+--- !u!114 &65245141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 65245131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866d3fc99e5095d46810c646567b74f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectilePrefab: {fileID: 5689635539177388990, guid: a8dc99883a514674eabf2235aec73f04, type: 3}
+  isActive: 0
+  baseShootInterval: 2.1
+  baseSpeed: 7
+  baseLifetime: 3
+  baseDamage: 1.56
+  basePenetrate: 1
+  baseSize: 1
+  baseCount: 4
 --- !u!4 &84081764 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6036693695987522047, guid: 7a6eb8c0d001f8f4e9eebf7742afd8df, type: 3}
@@ -1647,6 +1693,10 @@ PrefabInstance:
     - target: {fileID: 3279181480350928734, guid: 100b7577c3473a34eb874dbed5812c32, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7860025289440722972, guid: 100b7577c3473a34eb874dbed5812c32, type: 3}
+      propertyPath: health
+      value: 100000
       objectReference: {fileID: 0}
     - target: {fileID: 8435864082271188400, guid: 100b7577c3473a34eb874dbed5812c32, type: 3}
       propertyPath: m_LocalPosition.x

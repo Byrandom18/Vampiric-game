@@ -6,7 +6,7 @@ public class Projectile : MonoBehaviour
     public float speed = 8f;
     public float lifetime = 3f;
     public float damage = 1;
-    public float penetrate = 1;
+    public int penetrate = 1;
 
     public bool enemyLaunch = false;
 

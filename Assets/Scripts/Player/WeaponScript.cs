@@ -1,70 +1,45 @@
-using UnityEngine;
 using System.Collections;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using UnityEngine;
 
 public class WeaponScript : MonoBehaviour
 {
-    [SerializeField] private GameObject projectilePrefab;
-
-    private PlayerStats stats;
-
     private Transform playerTransform;
-    private WaitForSeconds shootDelay;
+    private PlayerStats stats;
+    private ConeScript cone;
+    public bool isConeActive = false;
 
-    [Header ("Базовая атака")]
-    [SerializeField] private float baseShootInterval = 2f;
-    [SerializeField] private float baseProjectileSpeed = 5;
-    [SerializeField] private float baseProjectileLifetime = 5;
-
-
-
+    private SpreadScript spread;
+    public bool isSpreadActive = false;
 
     private void Start()
     {
-        stats = GetComponent<PlayerStats>();
         playerTransform = transform;
-        shootDelay = new WaitForSeconds(baseShootInterval);
-        StartCoroutine(ShootRoutine());
+        stats = GetComponent<PlayerStats>();
+
+        cone = GetComponent<ConeScript>();
+        spread = GetComponent<SpreadScript>();
     }
 
-    private IEnumerator ShootRoutine()
+    private void Update()
     {
-        while (true)
-        {
-            ShootAtNearestEnemy();
-            yield return shootDelay;
-        }
+        WeaponTrigger();
     }
 
-    private void ShootAtNearestEnemy()
+    public void WeaponTrigger()
     {
-        GameObject nearestEnemy = FindNearestEnemy();
-        if (nearestEnemy == null) return;
+        if (isConeActive && !cone.isActive)
+            cone.Activation();
+        else if (!isConeActive && cone.isActive)
+            cone.isActive = false;
 
-        Vector2 direction = (nearestEnemy.transform.position - playerTransform.position).normalized;
-        SpawnProjectile(direction);
+        if (isSpreadActive && !spread.isActive)
+            spread.Activation();
+        else if (!isSpreadActive && spread.isActive)
+            spread.isActive = false;
     }
 
-
-    private void SpawnProjectile(Vector2 direction)
-    {
-        GameObject projectile = Instantiate(projectilePrefab, playerTransform.position, Quaternion.identity);
-        Projectile projectileScript = projectile.GetComponent<Projectile>();
-
-        if (projectileScript != null)
-        {
-            projectileScript.speed = baseProjectileSpeed * (1 + stats.projectileSpeed / 100);
-            projectileScript.lifetime = baseProjectileLifetime * (1 + stats.durations);
-            projectileScript.damage = 1 * stats.atk; // Урон из PlayerStats
-            projectileScript.penetrate = 1 + stats.penetrationBoost;
-            projectileScript.SetDirection(direction);
-        }
-    }
-
-
-
-
-
-    private GameObject FindNearestEnemy()
+    public GameObject FindNearestEnemy()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
         if (enemies.Length == 0) return null;
@@ -84,4 +59,28 @@ public class WeaponScript : MonoBehaviour
 
         return nearestEnemy;
     }
+
+    public void SpawnSingleProjectile(Vector2 direction, GameObject projectilePrefab, float baseSpeed, float baseLifetime, float baseDamage, int basePenetrate)
+    {
+        GameObject projectile = Instantiate(projectilePrefab, playerTransform.position, Quaternion.identity);
+
+        // Поворачиваем снаряд в направлении движения
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        projectile.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+        Projectile projectileScript = projectile.GetComponent<Projectile>();
+
+        float scaleModifier = 1 + stats.areaMod / 100;
+        projectile.transform.localScale = Vector3.one * scaleModifier;
+
+        if (projectileScript != null)
+        {
+            projectileScript.speed = baseSpeed * (1 + stats.projectileSpeed / 100);
+            projectileScript.lifetime = baseLifetime * (1 + stats.durations / 100);
+            projectileScript.damage = baseDamage * stats.atk;
+            projectileScript.penetrate = 1 + basePenetrate + stats.penetrationBoost;
+            projectileScript.SetDirection(direction);
+        }
+    }
+
 }
