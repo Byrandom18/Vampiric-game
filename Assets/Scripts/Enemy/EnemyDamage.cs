@@ -24,8 +24,11 @@ public class EnemyDamage : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, float defShred)
     {
+        defence -= defShred;
+        if (defence < 0)
+            defence = 0;
         damage -= defence;
         if (damage < 1)
             damage = 1;

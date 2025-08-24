@@ -10,6 +10,7 @@ public class ConeScript : MonoBehaviour
     private Transform playerTransform;
     private WeaponScript weapon;
 
+    public int aimTarget = 0;
 
     [Header("Базовые характеристики")]
     public bool isActive = false;
@@ -21,7 +22,7 @@ public class ConeScript : MonoBehaviour
     public float baseSize = 1f;
     public int baseCount = 3;
     public float coneAngle = 45f;
-    
+    public float baseDefShred = 0;
 
     private void Start()
     {
@@ -41,7 +42,7 @@ public class ConeScript : MonoBehaviour
     {
         while (isActive)
         {
-            ShootAtNearestEnemy();
+            ShootAtTargetEnemy();
             shootDelay = new WaitForSeconds(baseShootInterval * (1 - stats.cdRed / 100));
             yield return shootDelay;
         }
@@ -49,12 +50,33 @@ public class ConeScript : MonoBehaviour
 
     
 
-    private void ShootAtNearestEnemy()
+    private void ShootAtTargetEnemy()
     {
-        GameObject nearestEnemy = weapon.FindNearestEnemy();
-        if (nearestEnemy == null) return;
+        Vector2 direction = Vector2.zero;
+        GameObject targetEnemy = null;
 
-        Vector2 direction = (nearestEnemy.transform.position - playerTransform.position).normalized;
+
+        switch (aimTarget)
+        {
+            case 0:
+                targetEnemy = weapon.FindNearestEnemy();
+                break;
+            case 1:
+                targetEnemy = weapon.FindRandomEnemy();
+                break;
+            case 2:
+                targetEnemy = weapon.GetMouseDirectionAsTarget();
+                break;
+            case 3:
+                targetEnemy = weapon.FindWeakestEnemy();
+                break;
+            case 4:
+                targetEnemy = weapon.FindStrongestEnemy();
+                break;
+        }
+        if (targetEnemy == null) return;
+
+        direction = (targetEnemy.transform.position - playerTransform.position).normalized;
         SpawnConeProjectiles(direction);
     }
 
@@ -65,7 +87,7 @@ public class ConeScript : MonoBehaviour
 
         if (projectileCount == 1)
         {
-            weapon.SpawnSingleProjectile(mainDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate);
+            weapon.SpawnSingleProjectile(mainDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
             return;
         }
 
@@ -87,7 +109,7 @@ public class ConeScript : MonoBehaviour
         float delay = 0.1f * (1 - stats.cdRed / 100);
         // Создаем первый снаряд сразу
         Vector2 firstDirection = RotateVector2(mainDirection, startAngle + (angleStep * (projectileCount / 2)));
-        weapon.SpawnSingleProjectile(firstDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate);
+        weapon.SpawnSingleProjectile(firstDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
 
         // Ждем перед созданием остальных
         yield return new WaitForSeconds(delay);
@@ -102,18 +124,18 @@ public class ConeScript : MonoBehaviour
             if (leftIndex >= 0)
             {
                 Vector2 leftDirection = RotateVector2(mainDirection, startAngle + (angleStep * leftIndex));
-                weapon.SpawnSingleProjectile(leftDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate);
+                weapon.SpawnSingleProjectile(leftDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
             }
 
             if (rightIndex < projectileCount)
             {
                 Vector2 rightDirection = RotateVector2(mainDirection, startAngle + (angleStep * rightIndex));
-                weapon.SpawnSingleProjectile(rightDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate);
+                weapon.SpawnSingleProjectile(rightDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
             }
 
             // Фикс четного числа снарядов
             if (extra && pair == (projectileCount - 1) / 2)
-                weapon.SpawnSingleProjectile(firstDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate);
+                weapon.SpawnSingleProjectile(firstDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
 
             // Ждем перед следующей парой
             yield return new WaitForSeconds(delay);

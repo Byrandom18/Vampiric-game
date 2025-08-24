@@ -7,6 +7,7 @@ public class Projectile : MonoBehaviour
     public float lifetime = 3f;
     public float damage = 1;
     public int penetrate = 1;
+    public float defShred = 0;
 
     public bool enemyLaunch = false;
 
@@ -62,7 +63,7 @@ public class Projectile : MonoBehaviour
                 EnemyDamage enemy = collision.GetComponent<EnemyDamage>();
                 if (enemy != null)
                 {
-                    enemy.TakeDamage(damage);
+                    enemy.TakeDamage(damage, defShred);
                 }
                 penetrate -= 1;
                 if (penetrate <= 0)

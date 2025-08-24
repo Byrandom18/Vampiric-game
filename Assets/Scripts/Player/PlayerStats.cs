@@ -25,6 +25,7 @@ public class PlayerStats : MonoBehaviour
     public float cdRed;
     public int addProjectile;
     public float areaMod;
+    public float defShred;
     public bool invulnerability = false;
     
 

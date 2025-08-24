@@ -2,7 +2,7 @@ using System.ComponentModel;
 using UnityEngine;
 using System.Collections;
 
-public class SpreadScript : MonoBehaviour
+public class HomingSpreadScript : MonoBehaviour
 {
     [SerializeField] private GameObject projectilePrefab;
     private PlayerStats stats;
@@ -14,14 +14,14 @@ public class SpreadScript : MonoBehaviour
     [Header("Базовые характеристики")]
     public bool isActive = false;
     public float baseShootInterval = 3f;
-    public float baseSpeed = 4f;
+    public float baseSpeed = 6f;
     public float baseLifetime = 5f;
     public float baseDamage = 1f; // 1 = 100% atk
     public int basePenetrate = 1;
     public float baseSize = 1f;
-    public int baseCount = 4;
-    public float baseDefShred = 0;
-
+    public int baseCount = 3;
+    public float baseDefShred = 1;
+    public float baseRotation = 3f;
 
     private void Start()
     {
@@ -54,7 +54,7 @@ public class SpreadScript : MonoBehaviour
         if (projectileCount <= 0) return;
 
         float angleStep = 360f / projectileCount;
-        float spreadAngle = 45f; // Разброс
+        float spreadAngle = 15f; // Разброс
 
         for (int i = 0; i < projectileCount; i++)
         {
@@ -66,7 +66,7 @@ public class SpreadScript : MonoBehaviour
 
             Vector2 shotDirection = AngleToVector2(finalAngle);
             //SpawnSingleProjectile(shotDirection);
-            weapon.SpawnSingleProjectile(shotDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
+            SpawnHomingProjectile(shotDirection);
         }
     }
 
@@ -76,4 +76,28 @@ public class SpreadScript : MonoBehaviour
         return new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
     }
 
+    public void SpawnHomingProjectile(Vector2 direction)
+    {
+        GameObject projectile = Instantiate(projectilePrefab, playerTransform.position, Quaternion.identity);
+
+        // Поворачиваем снаряд в направлении движения
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        projectile.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+        SeekingMissile projectileScript = projectile.GetComponent<SeekingMissile>();
+
+        float scaleModifier = baseSize * (1 + stats.areaMod / 100);
+        projectile.transform.localScale = Vector3.one * scaleModifier;
+
+        if (projectileScript != null)
+        {
+            projectileScript.speed = baseSpeed * (1 + stats.projectileSpeed / 100);
+            projectileScript.lifetime = baseLifetime * (1 + stats.durations / 100);
+            projectileScript.damage = baseDamage * stats.atk;
+            projectileScript.penetrate = 1 + basePenetrate + stats.penetrationBoost;
+            projectileScript.defShred = baseDefShred + stats.defShred;
+            projectileScript.rotationSpeed = baseRotation;
+            //projectileScript.SetDirection(direction);
+        }
+    }
 }

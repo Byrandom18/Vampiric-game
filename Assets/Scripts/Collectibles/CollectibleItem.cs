@@ -123,7 +123,7 @@ public class CollectibleItem : MonoBehaviour
             if (enemy.CompareTag("Enemy") && enemy.isTrigger)
             {
 
-                enemy.GetComponent<EnemyDamage>().TakeDamage(PlayerStats.Instance.atk * bombDamageMod);
+                enemy.GetComponent<EnemyDamage>().TakeDamage(PlayerStats.Instance.atk * bombDamageMod, 0);
             }
         }
     }
