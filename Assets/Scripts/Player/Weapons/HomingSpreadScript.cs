@@ -1,72 +1,106 @@
-using System.ComponentModel;
 using UnityEngine;
 using System.Collections;
 
-public class HomingSpreadScript : MonoBehaviour
+public class HomingSpreadScript : WeaponBase
 {
+    [Header("Projectile Settings")]
     [SerializeField] private GameObject projectilePrefab;
+
+    [Header("Homing Specific Settings")]
+    public bool isActive = false;
+    public float spreadAngle = 15f;
+    public float baseRotation = 3f;
+
     private PlayerStats stats;
     private WaitForSeconds shootDelay;
     private Transform playerTransform;
-
     private WeaponScript weapon;
 
-    [Header("Базовые характеристики")]
-    public bool isActive = false;
-    public float baseShootInterval = 3f;
-    public float baseSpeed = 6f;
-    public float baseLifetime = 5f;
-    public float baseDamage = 1f; // 1 = 100% atk
-    public int basePenetrate = 1;
-    public float baseSize = 1f;
-    public int baseCount = 3;
-    public float baseDefShred = 1;
-    public float baseRotation = 3f;
-
-    private void Start()
+    protected override void Start()
     {
-        weapon = GetComponent<WeaponScript>();
+        base.Start();
         playerTransform = transform;
         stats = GetComponent<PlayerStats>();
-        shootDelay = new WaitForSeconds(baseShootInterval * (1 - stats.cdRed / 100));
+        weapon = GetComponent<WeaponScript>();
+        isActive = false;
+        UpdateShootDelay();
     }
 
     public void Activation()
     {
-        isActive = true;
-        StartCoroutine(ShootRoutine());
+        if (!isActive)
+        {
+            isActive = true;
+            StartCoroutine(ShootRoutine());
+        }
+    }
+
+    public void Deactivation()
+    {
+        isActive = false;
+        StopAllCoroutines();
     }
 
     private IEnumerator ShootRoutine()
     {
         while (isActive)
         {
-            float cdr = (1 - stats.cdRed / 100);
-            shootDelay = new WaitForSeconds(baseShootInterval * cdr);
             SpawnCircleProjectilesUniform();
+            UpdateShootDelay();
             yield return shootDelay;
         }
     }
+
+    private void UpdateShootDelay()
+    {
+        float cooldownReduction = stats != null ? (1 - stats.cdRed / 100) : 1f;
+        shootDelay = new WaitForSeconds(currentShootInterval * cooldownReduction);
+    }
+
     private void SpawnCircleProjectilesUniform()
     {
-        int projectileCount = baseCount + (stats != null ? stats.addProjectile : 0);
-
+        int projectileCount = currentCount + (stats != null ? stats.addProjectile : 0);
         if (projectileCount <= 0) return;
 
         float angleStep = 360f / projectileCount;
-        float spreadAngle = 15f; // Разброс
 
         for (int i = 0; i < projectileCount; i++)
         {
-            // Основной угол для равномерного распределения (начинаем с 0 градусов)
             float baseAngle = i * angleStep;
-
             float randomSpread = Random.Range(-spreadAngle, spreadAngle);
             float finalAngle = baseAngle + randomSpread;
 
             Vector2 shotDirection = AngleToVector2(finalAngle);
-            //SpawnSingleProjectile(shotDirection);
             SpawnHomingProjectile(shotDirection);
+        }
+    }
+
+    private void SpawnHomingProjectile(Vector2 direction)
+    {
+        if (projectilePrefab == null) return;
+
+        GameObject projectile = Instantiate(projectilePrefab, playerTransform.position, Quaternion.identity);
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        projectile.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+        SeekingMissile projectileScript = projectile.GetComponent<SeekingMissile>();
+        float sizeModifier = currentSize * (stats != null ? (1 + stats.areaMod / 100) : 1f);
+        projectile.transform.localScale = Vector3.one * sizeModifier;
+
+        if (projectileScript != null)
+        {
+            float finalSpeed = currentSpeed * (stats != null ? (1 + stats.projectileSpeed / 100) : 1f);
+            float finalLifetime = currentLifetime * (stats != null ? (1 + stats.durations / 100) : 1f);
+            float finalDamage = currentDamage * (stats != null ? stats.atk : 1f);
+            int finalPenetrate = currentPenetrate + (stats != null ? stats.penetrationBoost : 0);
+            float finalDefShred = currentDefShred + (stats != null ? stats.defShred : 0f);
+
+            projectileScript.speed = finalSpeed;
+            projectileScript.lifetime = finalLifetime;
+            projectileScript.damage = finalDamage;
+            projectileScript.penetrate = finalPenetrate;
+            projectileScript.defShred = finalDefShred;
+            projectileScript.rotationSpeed = baseRotation;
         }
     }
 
@@ -74,30 +108,5 @@ public class HomingSpreadScript : MonoBehaviour
     {
         float angleRad = angle * Mathf.Deg2Rad;
         return new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
-    }
-
-    public void SpawnHomingProjectile(Vector2 direction)
-    {
-        GameObject projectile = Instantiate(projectilePrefab, playerTransform.position, Quaternion.identity);
-
-        // Поворачиваем снаряд в направлении движения
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        projectile.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-
-        SeekingMissile projectileScript = projectile.GetComponent<SeekingMissile>();
-
-        float scaleModifier = baseSize * (1 + stats.areaMod / 100);
-        projectile.transform.localScale = Vector3.one * scaleModifier;
-
-        if (projectileScript != null)
-        {
-            projectileScript.speed = baseSpeed * (1 + stats.projectileSpeed / 100);
-            projectileScript.lifetime = baseLifetime * (1 + stats.durations / 100);
-            projectileScript.damage = baseDamage * stats.atk;
-            projectileScript.penetrate = 1 + basePenetrate + stats.penetrationBoost;
-            projectileScript.defShred = baseDefShred + stats.defShred;
-            projectileScript.rotationSpeed = baseRotation;
-            //projectileScript.SetDirection(direction);
-        }
     }
 }

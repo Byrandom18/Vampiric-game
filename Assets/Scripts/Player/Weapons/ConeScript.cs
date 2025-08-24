@@ -1,41 +1,53 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-public class ConeScript : MonoBehaviour
+public class ConeScript : WeaponBase
 {
+    [Header("Projectile Settings")]
     [SerializeField] private GameObject projectilePrefab;
+
+    [Header("Cone Specific Settings")]
+    public bool isActive = false;
+    public float coneAngle = 45f;
+    public int aimTarget = 0;
+
+    // Базовые характеристики теперь наследуются от WeaponBase
+    // baseShootInterval, baseSpeed, baseLifetime, baseDamage,
+    // basePenetrate, baseSize, baseCount, baseDefShred
+
     private PlayerStats stats;
     private WaitForSeconds shootDelay;
     private Transform playerTransform;
     private WeaponScript weapon;
 
-    public int aimTarget = 0;
-
-    [Header("Базовые характеристики")]
-    public bool isActive = false;
-    public float baseShootInterval = 2f;
-    public float baseSpeed = 5f;
-    public float baseLifetime = 5f;
-    public float baseDamage = 1f; // 1 = 100% atk
-    public int basePenetrate = 0;
-    public float baseSize = 1f;
-    public int baseCount = 3;
-    public float coneAngle = 45f;
-    public float baseDefShred = 0;
-
-    private void Start()
+    protected override void Start()
     {
+        base.Start(); // Важно вызвать базовый Start для инициализации статов
+
         playerTransform = transform;
         stats = GetComponent<PlayerStats>();
-        shootDelay = new WaitForSeconds(baseShootInterval * (1 - stats.cdRed / 100));
         weapon = GetComponent<WeaponScript>();
+
+        // Изначально выключаем оружие
+        isActive = false;
+
+        // Создаем начальную задержку
+        UpdateShootDelay();
     }
 
     public void Activation()
     {
-        isActive = true;
-        StartCoroutine(ShootRoutine());
+        if (!isActive)
+        {
+            isActive = true;
+            StartCoroutine(ShootRoutine());
+        }
+    }
+
+    public void Deactivation()
+    {
+        isActive = false;
+        StopAllCoroutines();
     }
 
     private IEnumerator ShootRoutine()
@@ -43,18 +55,21 @@ public class ConeScript : MonoBehaviour
         while (isActive)
         {
             ShootAtTargetEnemy();
-            shootDelay = new WaitForSeconds(baseShootInterval * (1 - stats.cdRed / 100));
+            UpdateShootDelay();
             yield return shootDelay;
         }
     }
 
-    
+    private void UpdateShootDelay()
+    {
+        float cooldownReduction = stats != null ? (1 - stats.cdRed / 100) : 1f;
+        shootDelay = new WaitForSeconds(currentShootInterval * cooldownReduction);
+    }
 
     private void ShootAtTargetEnemy()
     {
         Vector2 direction = Vector2.zero;
         GameObject targetEnemy = null;
-
 
         switch (aimTarget)
         {
@@ -74,71 +89,134 @@ public class ConeScript : MonoBehaviour
                 targetEnemy = weapon.FindStrongestEnemy();
                 break;
         }
-        if (targetEnemy == null) return;
 
-        direction = (targetEnemy.transform.position - playerTransform.position).normalized;
+        if (targetEnemy == null)
+        {
+            // Если врагов нет, стреляем вперед
+            direction = Vector2.right;
+        }
+        else
+        {
+            direction = (targetEnemy.transform.position - playerTransform.position).normalized;
+        }
+
         SpawnConeProjectiles(direction);
     }
 
-    
     private void SpawnConeProjectiles(Vector2 mainDirection)
     {
-        int projectileCount = baseCount + stats.addProjectile;
+        int projectileCount = currentCount + (stats != null ? stats.addProjectile : 0);
+
+        if (projectileCount <= 0) return;
 
         if (projectileCount == 1)
         {
-            weapon.SpawnSingleProjectile(mainDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
+            SpawnSingleProjectile(mainDirection);
             return;
         }
 
-        // Запускаем корутину для создания снарядов с задержками
         StartCoroutine(SpawnProjectilesWithDelay(mainDirection, projectileCount));
     }
 
     private IEnumerator SpawnProjectilesWithDelay(Vector2 mainDirection, int projectileCount)
     {
-        bool extra = false;
+        bool hasExtraProjectile = false;
         if (projectileCount % 2 == 0)
         {
             projectileCount -= 1;
-            extra = true;
+            hasExtraProjectile = true;
         }
 
         float angleStep = coneAngle / (projectileCount - 1);
         float startAngle = -coneAngle / 2f;
-        float delay = 0.1f * (1 - stats.cdRed / 100);
-        // Создаем первый снаряд сразу
-        Vector2 firstDirection = RotateVector2(mainDirection, startAngle + (angleStep * (projectileCount / 2)));
-        weapon.SpawnSingleProjectile(firstDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
+        float delay = CalculateProjectileDelay();
 
-        // Ждем перед созданием остальных
+        // Центральный снаряд
+        Vector2 centerDirection = RotateVector2(mainDirection, startAngle + (angleStep * (projectileCount / 2)));
+        SpawnSingleProjectile(centerDirection);
+
         yield return new WaitForSeconds(delay);
 
-        // Создаем остальные снаряды попарно с задержками
+        // Боковые снаряды попарно
         for (int pair = 1; pair <= (projectileCount - 1) / 2; pair++)
         {
-            // Создаем пару снарядов (левый и правый)
             int leftIndex = (projectileCount / 2) - pair;
             int rightIndex = (projectileCount / 2) + pair;
 
             if (leftIndex >= 0)
             {
                 Vector2 leftDirection = RotateVector2(mainDirection, startAngle + (angleStep * leftIndex));
-                weapon.SpawnSingleProjectile(leftDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
+                SpawnSingleProjectile(leftDirection);
             }
 
             if (rightIndex < projectileCount)
             {
                 Vector2 rightDirection = RotateVector2(mainDirection, startAngle + (angleStep * rightIndex));
-                weapon.SpawnSingleProjectile(rightDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
+                SpawnSingleProjectile(rightDirection);
             }
 
-            // Фикс четного числа снарядов
-            if (extra && pair == (projectileCount - 1) / 2)
-                weapon.SpawnSingleProjectile(firstDirection, projectilePrefab, baseSpeed, baseLifetime, baseDamage, basePenetrate, baseDefShred, baseSize);
+            // Дополнительный снаряд для четного количества
+            if (hasExtraProjectile && pair == (projectileCount - 1) / 2)
+            {
+                SpawnSingleProjectile(centerDirection);
+            }
 
-            // Ждем перед следующей парой
             yield return new WaitForSeconds(delay);
+        }
+    }
+
+    private float CalculateProjectileDelay()
+    {
+        float baseDelay = 0.1f;
+        float cooldownReduction = stats != null ? (1 - stats.cdRed / 100) : 1f;
+        return baseDelay * cooldownReduction;
+    }
+
+    private void SpawnSingleProjectile(Vector2 direction)
+    {
+        if (projectilePrefab == null) return;
+
+        GameObject projectile = Instantiate(projectilePrefab, playerTransform.position, Quaternion.identity);
+
+        // Поворачиваем снаряд в направлении движения
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        projectile.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+        Projectile projectileScript = projectile.GetComponent<Projectile>();
+
+        // Рассчитываем модификатор размера
+        float sizeModifier = currentSize;
+        if (stats != null)
+        {
+            sizeModifier *= (1 + stats.areaMod / 100);
+        }
+        projectile.transform.localScale = Vector3.one * sizeModifier;
+
+        if (projectileScript != null)
+        {
+            // Используем текущие статы из WeaponBase
+            float finalSpeed = currentSpeed;
+            float finalLifetime = currentLifetime;
+            float finalDamage = currentDamage;
+            int finalPenetrate = currentPenetrate;
+            float finalDefShred = currentDefShred;
+
+            // Применяем бонусы от статов игрока
+            if (stats != null)
+            {
+                finalSpeed *= (1 + stats.projectileSpeed / 100);
+                finalLifetime *= (1 + stats.durations / 100);
+                finalDamage *= stats.atk;
+                finalPenetrate += stats.penetrationBoost;
+                finalDefShred += stats.defShred;
+            }
+
+            projectileScript.speed = finalSpeed;
+            projectileScript.lifetime = finalLifetime;
+            projectileScript.damage = finalDamage;
+            projectileScript.penetrate = finalPenetrate;
+            projectileScript.defShred = finalDefShred;
+            projectileScript.SetDirection(direction);
         }
     }
 
@@ -154,5 +232,33 @@ public class ConeScript : MonoBehaviour
         );
     }
 
-    
+    // Метод для обновления статов извне (например, из карточек)
+    public void UpdateWeaponStatsFromCard(float damageMult, float speedMult, float lifetimeMult,
+                                        float sizeMult, float intervalMult, int penetrateAdd,
+                                        int countAdd, float defShredAdd)
+    {
+        ApplyTemporaryMultipliers(damageMult, speedMult, lifetimeMult, sizeMult,
+                                intervalMult, penetrateAdd, countAdd, defShredAdd);
+    }
+
+    // Метод для сброса временных модификаторов
+    public void ResetWeaponStats()
+    {
+        ResetTemporaryMultipliers();
+    }
+
+    // Для дебаггинга
+    private void OnGUI()
+    {
+        if (Debug.isDebugBuild && isActive)
+        {
+            GUI.Label(new Rect(10, 100, 300, 200),
+                     $"Cone Stats:\n" +
+                     $"Damage: {currentDamage}\n" +
+                     $"Speed: {currentSpeed}\n" +
+                     $"Count: {currentCount}\n" +
+                     $"Interval: {currentShootInterval}\n" +
+                     $"Active: {isActive}");
+        }
+    }
 }

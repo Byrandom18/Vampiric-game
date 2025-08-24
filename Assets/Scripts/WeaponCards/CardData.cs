@@ -1,7 +1,6 @@
 using UnityEngine;
 
-
-public enum WeaponType { Cone, Spread, Armor, Minigun, Homing, Bouncing }
+public enum WeaponType { Cone, Spread, ArmorBreak, Minigun, Homing, Bouncing }
 public enum StatType { Damage, Speed, Health, Crit, Area, Duration, Penetration, ProjectileSpeed }
 
 [CreateAssetMenu(fileName = "New Card", menuName = "Cards/Card Data")]
@@ -18,11 +17,11 @@ public class CardData : ScriptableObject
     public bool isWeaponUnlock = false;
 
     [Header("Multipliers")]
-    public float damageMultiplier = 1f;
-    public float speedMultiplier = 1f;
-    public float lifetimeMultiplier = 1f;
-    public float sizeMultiplier = 1f;
-    public float intervalMultiplier = 1f;
+    [Range(0.1f, 2f)] public float damageMultiplier = 1f;
+    [Range(0.1f, 2f)] public float speedMultiplier = 1f;
+    [Range(0.1f, 2f)] public float lifetimeMultiplier = 1f;
+    [Range(0.1f, 2f)] public float sizeMultiplier = 1f;
+    [Range(0.1f, 2f)] public float intervalMultiplier = 1f;
 
     [Header("Additive Bonuses")]
     public int penetrateAdd = 0;
@@ -34,7 +33,7 @@ public class CardData : ScriptableObject
     public float statValue = 0f;
 
     [Header("Requirements")]
-    public int requiredLevel = 1;
+    public int requiredLevel = 1; // ÄÎÁÀÂÜÒÅ İÒÓ ÑÒĞÎÊÓ
     public CardData[] requiredCards;
 
     public string GetDescription(int currentLevel)

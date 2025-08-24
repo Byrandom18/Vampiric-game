@@ -36,13 +36,14 @@ public class PlayerStats : MonoBehaviour
     public float gold;
     public int gems;
 
-    
 
+    private PlayerLevelSystem pls;
     private void Start()
     {
         Instance = this;
         health = maxHealth;
         BarsUpdate();
+        pls = GetComponent<PlayerLevelSystem>();
     }
 
 
@@ -71,11 +72,13 @@ public class PlayerStats : MonoBehaviour
     {
         exp += value;
         Debug.Log("exp = " + exp);
+        pls.AddExperience(100);
     }
     public void AddGold(float value)
     {
         gold += value;
         Debug.Log("gold = " + gold);
+        
     }
     public void AddHealth()
     {

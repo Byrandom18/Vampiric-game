@@ -1,149 +1,161 @@
-//// WeaponManager.cs
-//using UnityEngine;
-//using System.Collections.Generic;
+// WeaponManager.cs
+using UnityEngine;
+using System.Collections.Generic;
 
-//public class WeaponManager : MonoBehaviour
-//{
-//    [System.Serializable]
-//    public class WeaponStatus
-//    {
-//        public bool isUnlocked = false;
-//        public int level = 0;
-//        public float damageMultiplier = 1f;
-//        public float speedMultiplier = 1f;
-//        public float lifetimeMultiplier = 1f;
-//        public float sizeMultiplier = 1f;
-//        public float intervalMultiplier = 1f;
-//        public int penetrateAdd = 0;
-//        public int countAdd = 0;
-//        public float defShredAdd = 0f;
-//    }
 
-//    public static WeaponManager Instance;
 
-//    [Header("Weapon References")]
-//    public ConeScript coneWeapon;
-//    public SpreadScript spreadWeapon;
-//    public ArmorBreakScript armorBreakWeapon;
-//    public MinigunScript minigunWeapon;
-//    public HomingSpreadScript homingWeapon;
-//    public BouncingScript bouncingWeapon;
+public class WeaponManager : MonoBehaviour
+{
+    [System.Serializable]
+    public class WeaponStatus
+    {
+        public bool isUnlocked = false;
+        public int level = 0;
+        public float damageMultiplier = 1f;
+        public float speedMultiplier = 1f;
+        public float lifetimeMultiplier = 1f;
+        public float sizeMultiplier = 1f;
+        public float intervalMultiplier = 1f;
+        public int penetrateAdd = 0;
+        public int countAdd = 0;
+        public float defShredAdd = 0f;
+    }
 
-//    public Dictionary<WeaponType, WeaponStatus> weaponStatuses = new Dictionary<WeaponType, WeaponStatus>();
+    public static WeaponManager Instance;
 
-//    private void Awake()
-//    {
-//        if (Instance == null)
-//        {
-//            Instance = this;
-//            DontDestroyOnLoad(gameObject);
-//        }
-//        else
-//        {
-//            Destroy(gameObject);
-//        }
+    [Header("Weapon References")]
+    public ConeScript coneWeapon;
+    public SpreadScript spreadWeapon;
+    public ArmorBreakScript armorBreakWeapon;
+    public MinigunScript minigunWeapon;
+    public HomingSpreadScript homingWeapon;
+    public BouncingScript bouncingWeapon;
 
-//        InitializeWeaponStatuses();
-//    }
+    public Dictionary<WeaponType, WeaponStatus> weaponStatuses = new Dictionary<WeaponType, WeaponStatus>();
+    public Dictionary<WeaponType, WeaponBase> weaponScripts = new Dictionary<WeaponType, WeaponBase>();
 
-//    private void InitializeWeaponStatuses()
-//    {
-//        foreach (WeaponType type in System.Enum.GetValues(typeof(WeaponType)))
-//        {
-//            weaponStatuses[type] = new WeaponStatus();
-//        }
-//    }
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
 
-//    public void ApplyCardEffect(CardData card)
-//    {
-//        if (card.isWeaponUnlock)
-//        {
-//            UnlockWeapon(card.weaponType);
-//        }
-//        else
-//        {
-//            UpgradeWeapon(card);
-//        }
+        InitializeWeaponStatuses();
+        MapWeaponScripts();
+    }
 
-//        UpdateWeaponParameters(card.weaponType);
-//    }
+    private void InitializeWeaponStatuses()
+    {
+        foreach (WeaponType type in System.Enum.GetValues(typeof(WeaponType)))
+        {
+            weaponStatuses[type] = new WeaponStatus();
+        }
+    }
 
-//    private void UnlockWeapon(WeaponType weaponType)
-//    {
-//        weaponStatuses[weaponType].isUnlocked = true;
-//        weaponStatuses[weaponType].level = 1;
-//        ActivateWeapon(weaponType);
-//    }
+    private void MapWeaponScripts()
+    {
+        weaponScripts[WeaponType.Cone] = coneWeapon;
+        weaponScripts[WeaponType.Spread] = spreadWeapon;
+        weaponScripts[WeaponType.ArmorBreak] = armorBreakWeapon;
+        weaponScripts[WeaponType.Minigun] = minigunWeapon;
+        weaponScripts[WeaponType.Homing] = homingWeapon;
+        weaponScripts[WeaponType.Bouncing] = bouncingWeapon;
 
-//    private void UpgradeWeapon(CardData card)
-//    {
-//        WeaponStatus status = weaponStatuses[card.weaponType];
-//        status.level++;
+        // Только логическое отключение, не физическое
+        foreach (var weaponType in weaponScripts.Keys)
+        {
+            SetWeaponActive(weaponType, false);
+        }
+    }
 
-//        // Apply multipliers
-//        status.damageMultiplier *= card.damageMultiplier;
-//        status.speedMultiplier *= card.speedMultiplier;
-//        status.lifetimeMultiplier *= card.lifetimeMultiplier;
-//        status.sizeMultiplier *= card.sizeMultiplier;
-//        status.intervalMultiplier *= card.intervalMultiplier;
+    public void ApplyCardEffect(CardData card)
+    {
+        if (card.isWeaponUnlock)
+        {
+            UnlockWeapon(card.weaponType);
+        }
+        else
+        {
+            UpgradeWeapon(card);
+        }
 
-//        // Apply additive bonuses
-//        status.penetrateAdd += card.penetrateAdd;
-//        status.countAdd += card.countAdd;
-//        status.defShredAdd += card.defShredAdd;
-//    }
+        UpdateWeaponParameters(card.weaponType);
+    }
 
-//    private void UpdateWeaponParameters(WeaponType weaponType)
-//    {
-//        WeaponStatus status = weaponStatuses[weaponType];
+    private void UnlockWeapon(WeaponType weaponType)
+    {
+        weaponStatuses[weaponType].isUnlocked = true;
+        weaponStatuses[weaponType].level = 1;
 
-//        switch (weaponType)
-//        {
-//            case WeaponType.Cone:
-//                UpdateWeaponStats(coneWeapon, status);
-//                break;
-//            case WeaponType.Axe:
-//                UpdateWeaponStats(axeWeapon, status);
-//                break;
-//                // Add other weapons...
-//        }
-//    }
+        if (weaponScripts.ContainsKey(weaponType) && weaponScripts[weaponType] != null)
+        {
+            weaponScripts[weaponType].gameObject.SetActive(true);
+            weaponScripts[weaponType].UpdateStats();
 
-//    private void UpdateWeaponStats(WeaponBase weapon, WeaponStatus status)
-//    {
-//        weapon.baseDamage *= status.damageMultiplier;
-//        weapon.baseSpeed *= status.speedMultiplier;
-//        weapon.baseLifetime *= status.lifetimeMultiplier;
-//        weapon.baseSize *= status.sizeMultiplier;
-//        weapon.baseShootInterval *= status.intervalMultiplier;
-//        weapon.basePenetrate += status.penetrateAdd;
-//        weapon.baseCount += status.countAdd;
-//        weapon.baseDefShred += status.defShredAdd;
+            // Активируем оружие в WeaponScript
+            SetWeaponActive(weaponType, true);
+        }
+    }
 
-//        // Reset multipliers for next upgrade
-//        ResetMultipliers(status);
-//    }
+    private void SetWeaponActive(WeaponType weaponType, bool active)
+    {
+        WeaponScript weaponScript = FindFirstObjectByType<WeaponScript>();
+        if (weaponScript != null)
+        {
+            switch (weaponType)
+            {
+                case WeaponType.Cone: weaponScript.isConeActive = active; break;
+                case WeaponType.Spread: weaponScript.isSpreadActive = active; break;
+                case WeaponType.ArmorBreak: weaponScript.isArmorBreakActive = active; break;
+                case WeaponType.Minigun: weaponScript.isMinigunActive = active; break;
+                case WeaponType.Homing: weaponScript.isHomingActive = active; break;
+                case WeaponType.Bouncing: weaponScript.isBouncingActive = active; break;
+            }
+        }
+    }
 
-//    private void ResetMultipliers(WeaponStatus status)
-//    {
-//        status.damageMultiplier = 1f;
-//        status.speedMultiplier = 1f;
-//        status.lifetimeMultiplier = 1f;
-//        status.sizeMultiplier = 1f;
-//        status.intervalMultiplier = 1f;
-//    }
+    private void UpgradeWeapon(CardData card)
+    {
+        WeaponStatus status = weaponStatuses[card.weaponType];
+        status.level++;
 
-//    private void ActivateWeapon(WeaponType weaponType)
-//    {
-//        switch (weaponType)
-//        {
-//            case WeaponType.Sword:
-//                swordWeapon.gameObject.SetActive(true);
-//                break;
-//            case WeaponType.Axe:
-//                axeWeapon.gameObject.SetActive(true);
-//                break;
-//                // Add other weapons...
-//        }
-//    }
-//}
+        status.damageMultiplier *= card.damageMultiplier;
+        status.speedMultiplier *= card.speedMultiplier;
+        status.lifetimeMultiplier *= card.lifetimeMultiplier;
+        status.sizeMultiplier *= card.sizeMultiplier;
+        status.intervalMultiplier *= card.intervalMultiplier;
+        status.penetrateAdd += card.penetrateAdd;
+        status.countAdd += card.countAdd;
+        status.defShredAdd += card.defShredAdd;
+    }
+
+    private void UpdateWeaponParameters(WeaponType weaponType)
+    {
+        if (!weaponScripts.ContainsKey(weaponType) || weaponScripts[weaponType] == null) return;
+
+        WeaponStatus status = weaponStatuses[weaponType];
+        WeaponBase weapon = weaponScripts[weaponType];
+
+        weapon.ApplyTemporaryMultipliers(
+            status.damageMultiplier,
+            status.speedMultiplier,
+            status.lifetimeMultiplier,
+            status.sizeMultiplier,
+            status.intervalMultiplier,
+            status.penetrateAdd,
+            status.countAdd,
+            status.defShredAdd
+        );
+    }
+
+    public bool IsWeaponUnlocked(WeaponType weaponType)
+    {
+        return weaponStatuses.ContainsKey(weaponType) && weaponStatuses[weaponType].isUnlocked;
+    }
+}
