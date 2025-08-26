@@ -117,6 +117,7 @@ public class WeaponScript : MonoBehaviour
         // Создаем временный объект для представления направления мыши
         GameObject mouseTarget = new GameObject("MouseTarget");
         mouseTarget.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Destroy(mouseTarget, 1f);
         return mouseTarget;
     }
 

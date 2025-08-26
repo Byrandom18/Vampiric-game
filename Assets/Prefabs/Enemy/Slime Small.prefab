@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 2982257753320630059}
   - component: {fileID: 1982635957591597317}
   - component: {fileID: 1307804051287687243}
+  - component: {fileID: 6067383556972949496}
   m_Layer: 6
   m_Name: Slime Small
   m_TagString: Enemy
@@ -191,6 +192,9 @@ MonoBehaviour:
   damage: 1
   health: 10
   defence: 0
+  damageColor: {r: 1, g: 0, b: 0, a: 1}
+  healColor: {r: 0, g: 1, b: 0, a: 1}
+  textSize: 3.5
 --- !u!70 &2982257753320630059
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -264,3 +268,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canDoppel: 0
   summons: []
+--- !u!114 &6067383556972949496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4745026682925064837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 090af3a56ba92d845b05b9fd5bdad238, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageTextPrefab: {fileID: 8724647151671088805, guid: 6ecbc6154ca65c046a010bbc8a1bdfe4, type: 3}
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  defaultSize: 4
+  defaultLifeTime: 2

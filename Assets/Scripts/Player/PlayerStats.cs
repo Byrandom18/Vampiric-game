@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -11,14 +12,15 @@ public class PlayerStats : MonoBehaviour
     public float health = 100;
     public float maxHealth;
     public float healthRegen;
+    public float baseAtk = 10;
     public float atk = 1;
+    public float atkMod;
     public float damageMod;
     public float luck;
-    public float critRate;
-    public float critDamage;
+    public float critRate = 5;
+    public float critDamage = 50;
     public float def;
     public float speedMod;
-    public float attackSpeed;
     public int penetrationBoost;
     public float projectileSpeed;
     public float durations;
@@ -30,22 +32,34 @@ public class PlayerStats : MonoBehaviour
     
 
     [Header("Вспомогательные характеристики")]
-    public float maxExp;
+    public float maxExp = 5;
     public float exp;
-    public int lvl;
+    public float expIncrease = 10;
+    public int lvl = 1;
     public float gold;
     public int gems;
 
-
-    private PlayerLevelSystem pls;
     private void Start()
     {
         Instance = this;
+        atk = baseAtk * (1 + atkMod / 100);
         health = maxHealth;
         BarsUpdate();
-        pls = GetComponent<PlayerLevelSystem>();
+        StartCoroutine(HealthRegen());
     }
 
+    private IEnumerator HealthRegen()
+    {
+        if (health < maxHealth)
+        {
+            health += healthRegen;
+            if (health > maxHealth)
+                health = maxHealth;
+            BarsUpdate();
+        }
+        yield return new WaitForSeconds(1);
+        StartCoroutine(HealthRegen());
+    }
 
     public void TakeDamage(float damage)
     {
@@ -72,7 +86,8 @@ public class PlayerStats : MonoBehaviour
     {
         exp += value;
         Debug.Log("exp = " + exp);
-        pls.AddExperience(100);
+        if (exp >= maxExp)
+            LevelUp();
     }
     public void AddGold(float value)
     {
@@ -86,5 +101,24 @@ public class PlayerStats : MonoBehaviour
         if (health > maxHealth)
             health = maxHealth;
         BarsUpdate();
+    }
+
+    
+
+    private void LevelUp()
+    {
+        lvl++;
+        exp -= maxExp;
+        if (lvl % 10 == 0)
+            expIncrease += 2;
+        maxExp += expIncrease;
+
+        // Вызываем систему выбора карточек
+        if (CardSelectionSystem.Instance != null)
+        {
+            CardSelectionSystem.Instance.ShowCardSelection();
+        }
+        if (exp > maxExp)
+            LevelUp();
     }
 }

@@ -19,7 +19,6 @@ public class PlayerProgress : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {

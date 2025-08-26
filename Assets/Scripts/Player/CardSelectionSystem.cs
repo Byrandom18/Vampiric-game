@@ -155,12 +155,12 @@ public class CardSelectionSystem : MonoBehaviour
     /// </summary>
     private bool IsCardAvailable(CardData card)
     {
-        // Проверяем требования уровня
-        if (PlayerLevelSystem.Instance != null &&
-            PlayerLevelSystem.Instance.currentLevel < card.requiredLevel)
-        {
-            return false;
-        }
+        //// Проверяем требования уровня
+        //if (PlayerLevelSystem.Instance != null &&
+        //    PlayerLevelSystem.Instance.currentLevel < card.requiredLevel)
+        //{
+        //    return false;
+        //}
 
         // Для карт разблокировки оружия проверяем, не разблокировано ли уже оружие
         if (card.isWeaponUnlock)

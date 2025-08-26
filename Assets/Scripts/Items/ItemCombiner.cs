@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Linq;
 public class ItemCombiner : MonoBehaviour
 {
-    [SerializeField] private float inheritanceChance = 0.7f;
+    //[SerializeField] private float inheritanceChance = 0.7f;
 
     public EquipmentItem CombineItems(EquipmentItem item1, EquipmentItem item2)
     {

@@ -28,3 +28,6 @@ MonoBehaviour:
   defShredAdd: 0
   statType: 0
   statValue: 0
+  requiredLevel: 1
+  requiredCards:
+  - {fileID: 11400000, guid: fe69d4973210dee4d91a8f399f5fa259, type: 2}

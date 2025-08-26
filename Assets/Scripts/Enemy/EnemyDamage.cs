@@ -7,6 +7,10 @@ public class EnemyDamage : MonoBehaviour
     public float health = 10;
     public float defence = 0;
 
+    [Header("Настройки текста урона")]
+    public Color damageColor = Color.red;
+    public float textSize = 1f;
+    private DamageTextManager textManager;
 
     private Animator animator;
     private float shrinkDuration = 0.5f; // Длительность сжатия
@@ -14,6 +18,7 @@ public class EnemyDamage : MonoBehaviour
     private void Start()
     {
         animator = GetComponent<Animator>();
+        textManager = GetComponent<DamageTextManager>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -29,11 +34,25 @@ public class EnemyDamage : MonoBehaviour
         defence -= defShred;
         if (defence < 0)
             defence = 0;
+        float critCheck = Random.Range(0f, 100f);
+        float currentTextSize = textSize;
+        if (critCheck <= PlayerStats.Instance.critRate)
+        {
+            damage *= 1 + PlayerStats.Instance.critDamage / 100;
+            currentTextSize *= 1.5f;
+        }
+
+
         damage -= defence;
         if (damage < 1)
             damage = 1;
         health -= damage;
         Debug.Log("здоровье врага: " + health);
+
+        int damageText = Mathf.RoundToInt(damage);
+        Vector3 spawnPos = transform.position + Vector3.up * 0.5f; // Чуть выше врага
+        textManager.CreateDamageText(damageText, spawnPos, damageColor, currentTextSize);
+
         if (health <= 0)
         {
             animator.SetTrigger("Death");

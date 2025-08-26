@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2406425240035520855}
   - component: {fileID: 1520768831122462351}
   - component: {fileID: 5178239346377678757}
+  - component: {fileID: 4379361216490367724}
   m_Layer: 6
   m_Name: Spider
   m_TagString: Enemy
@@ -190,6 +191,9 @@ MonoBehaviour:
   damage: 1
   health: 10
   defence: 0
+  damageColor: {r: 1, g: 0, b: 0, a: 1}
+  healColor: {r: 0, g: 1, b: 0, a: 1}
+  textSize: 3.5
 --- !u!70 &1520768831122462351
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -249,3 +253,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4379361216490367724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529966383589268248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 090af3a56ba92d845b05b9fd5bdad238, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageTextPrefab: {fileID: 8724647151671088805, guid: 6ecbc6154ca65c046a010bbc8a1bdfe4, type: 3}
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  defaultSize: 4
+  defaultLifeTime: 2
