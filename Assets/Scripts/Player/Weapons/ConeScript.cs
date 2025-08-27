@@ -206,7 +206,7 @@ public class ConeScript : WeaponBase
             {
                 finalSpeed *= (1 + stats.projectileSpeed / 100);
                 finalLifetime *= (1 + stats.durations / 100);
-                finalDamage *= stats.atk;
+                finalDamage *= stats.atk * (stats != null ? (1 + stats.damageMod / 100) : 1f);
                 finalPenetrate += stats.penetrationBoost;
                 finalDefShred += stats.defShred;
             }

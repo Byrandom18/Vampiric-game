@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16c19875bfb10f34aa23e93c79965d6a, type: 3}
+  m_Name: CdRed
+  m_EditorClassIdentifier: 
+  cardName: "\u041E\u043A\u0442\u0430\u0440\u0438\u043D"
+  description: "\u0443\u043C\u0435\u043D\u044C\u0448\u0430\u0435\u0442 \u043F\u0435\u0440\u0435\u0437\u0430\u0440\u044F\u0434\u043A\u0443
+    \u0432\u0441\u0435\u0433\u043E \u043E\u0440\u0443\u0436\u0438\u044F \u043D\u0430
+    {stat}%"
+  icon: {fileID: -1517466257159231088, guid: 6cd194515715c524aa4bc870dfe13a7c, type: 3}
+  maxLevel: 5
+  weaponType: 0
+  isWeaponUnlock: 0
+  damageMultiplier: 1
+  speedMultiplier: 1
+  lifetimeMultiplier: 1
+  sizeMultiplier: 1
+  intervalMultiplier: 1
+  penetrateAdd: 0
+  countAdd: 0
+  defShredAdd: 0
+  statType: 13
+  statValue: 5
+  requiredLevel: 3
+  requiredCards: []

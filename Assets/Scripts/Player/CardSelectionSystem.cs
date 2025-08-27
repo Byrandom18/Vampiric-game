@@ -155,12 +155,7 @@ public class CardSelectionSystem : MonoBehaviour
     /// </summary>
     private bool IsCardAvailable(CardData card)
     {
-        //// Проверяем требования уровня
-        //if (PlayerLevelSystem.Instance != null &&
-        //    PlayerLevelSystem.Instance.currentLevel < card.requiredLevel)
-        //{
-        //    return false;
-        //}
+        
 
         // Для карт разблокировки оружия проверяем, не разблокировано ли уже оружие
         if (card.isWeaponUnlock)
@@ -269,9 +264,9 @@ public class CardSelectionSystem : MonoBehaviour
         else if (card.statValue != 0)
         {
             // Улучшаем статы игрока
-            if (PlayerStatsManager.Instance != null)
+            if (PlayerStats.Instance != null)
             {
-                PlayerStatsManager.Instance.UpgradeStat(card.statType, card.statValue);
+                PlayerStats.Instance.UpgradeStat(card.statType, card.statValue);
             }
         }
         else
@@ -376,7 +371,7 @@ public class CardSelectionSystem : MonoBehaviour
             }
             else
             {
-                levelUpText.text = "LEVEL UP! Choose an upgrade:";
+                levelUpText.text = $"LEVEL {PlayerStats.Instance.lvl}!";
             }
         }
     }
@@ -406,6 +401,8 @@ public class CardSelectionSystem : MonoBehaviour
     /// </summary>
     private void OnSelectionComplete()
     {
+        if (PlayerStats.Instance.exp > PlayerStats.Instance.maxExp)
+            PlayerStats.Instance.LevelUp();
         // Уведомляем другие системы
         // Debug.Log("Card selection completed");
     }

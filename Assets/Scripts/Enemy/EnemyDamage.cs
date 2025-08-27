@@ -3,6 +3,8 @@ using System.Collections;
 
 public class EnemyDamage : MonoBehaviour
 {
+    [SerializeField] private GameObject expPrefab;
+
     public float damage = 1;
     public float health = 10;
     public float defence = 0;
@@ -19,6 +21,14 @@ public class EnemyDamage : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         textManager = GetComponent<DamageTextManager>();
+        if (PlayerStats.Instance != null)
+            UpdateStats();
+    }
+
+    private void UpdateStats()
+    {
+        health *= 1 + PlayerStats.Instance.difficultyMod * 0.1f;
+        damage *= 1 + PlayerStats.Instance.difficultyMod * 0.1f;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -41,7 +51,6 @@ public class EnemyDamage : MonoBehaviour
             damage *= 1 + PlayerStats.Instance.critDamage / 100;
             currentTextSize *= 1.5f;
         }
-
 
         damage -= defence;
         if (damage < 1)
@@ -75,8 +84,22 @@ public class EnemyDamage : MonoBehaviour
             transform.localScale = originalScale * (1 - progress);
             yield return null;
         }
-
+        ItemCreate();
         Destroy(gameObject);
     }
 
+    private void ItemCreate()
+    {
+        if (expPrefab != null)
+        {
+            GameObject exp = Instantiate(expPrefab, transform.position, Quaternion.identity);
+            CollectibleItem expScript = exp.GetComponent<CollectibleItem>();
+            if (expScript != null)
+            {
+                expScript.value = 1 * (1 + PlayerStats.Instance.difficultyMod * 0.05f);
+            }
+        }
+        else
+            Debug.Log("Exp Prefab doesn't exists" + this);
+    }
 }

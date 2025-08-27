@@ -10,6 +10,8 @@ public class PlayerStats : MonoBehaviour
 
     [Header ("Ѕоевые характеристики")]
     public float health = 100;
+    public float baseHealth = 100;
+    public float healthMod;
     public float maxHealth;
     public float healthRegen;
     public float baseAtk = 10;
@@ -39,13 +41,64 @@ public class PlayerStats : MonoBehaviour
     public float gold;
     public int gems;
 
-    private void Start()
+    [Header("Ќастройки сложности и прогрессии")]
+    public float difficultyChange = 1; //как сильно растет
+    public float difficultyMod = 1f; //множитель х-к
+    public float difficultyDelay = 30f; //врем€ до повышени€
+
+    private void Awake()
     {
         Instance = this;
+    }
+
+    private void Start()
+    {
         atk = baseAtk * (1 + atkMod / 100);
+        UpdateStats();
         health = maxHealth;
         BarsUpdate();
         StartCoroutine(HealthRegen());
+        StartCoroutine(DifficultyChange());
+    }
+
+    private IEnumerator DifficultyChange()
+    {
+        yield return new WaitForSeconds(difficultyDelay);
+        difficultyMod += difficultyChange;
+        StartCoroutine(DifficultyChange());
+    }
+
+    public void UpgradeStat(StatType statType, float value)
+    {
+        switch (statType)
+        {
+            case StatType.BaseHealth: baseHealth += value; break;
+            case StatType.HealthMod: healthMod += value; break;
+            case StatType.HealthRegen: healthRegen += value; break;
+            case StatType.BaseAtk: baseAtk += value; break;
+            case StatType.AtkMod: atkMod += value; break;
+            case StatType.DamageMod: damageMod += value; break;
+            case StatType.Luck: luck += value; break;
+            case StatType.CritRate: critRate += value; break;
+            case StatType.CritDamage: critDamage += value; break;
+            case StatType.Def: def += value; break;
+            case StatType.PenetrationBoost: penetrationBoost += Mathf.RoundToInt(value); break;
+            case StatType.ProjectileSpeed: projectileSpeed += value; break;
+            case StatType.Durations: durations += value; break;
+            case StatType.CdRed: cdRed += value; break;
+            case StatType.AddProjectile: addProjectile += Mathf.RoundToInt(value); break;
+            case StatType.AreaMod: areaMod += value; break;
+            case StatType.DefShred: defShred += value; break;
+        }
+
+        UpdateStats();
+    }
+
+    private void UpdateStats()
+    {
+        atk = baseAtk * (1 + atkMod / 100);
+        maxHealth = baseHealth * (1 + healthMod / 100);
+        BarsUpdate();
     }
 
     private IEnumerator HealthRegen()
@@ -105,7 +158,7 @@ public class PlayerStats : MonoBehaviour
 
     
 
-    private void LevelUp()
+    public void LevelUp()
     {
         lvl++;
         exp -= maxExp;
@@ -118,7 +171,6 @@ public class PlayerStats : MonoBehaviour
         {
             CardSelectionSystem.Instance.ShowCardSelection();
         }
-        if (exp > maxExp)
-            LevelUp();
+        
     }
 }

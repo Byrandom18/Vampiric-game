@@ -192,7 +192,7 @@ public class WeaponScript : MonoBehaviour
         {
             projectileScript.speed = baseSpeed * (1 + stats.projectileSpeed / 100);
             projectileScript.lifetime = baseLifetime * (1 + stats.durations / 100);
-            projectileScript.damage = baseDamage * stats.atk;
+            projectileScript.damage = baseDamage * stats.atk * (1 + stats.damageMod / 100);
             projectileScript.penetrate = 1 + basePenetrate + stats.penetrationBoost;
             projectileScript.defShred = baseDefShred + stats.defShred;
             projectileScript.SetDirection(direction);

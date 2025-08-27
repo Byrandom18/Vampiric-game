@@ -19,6 +19,7 @@ public class SeekingMissile : MonoBehaviour
         movementDirection = transform.right;
         Destroy(gameObject, lifetime);
         InvokeRepeating("UpdateTarget", 0f, 0.3f);
+        rotationSpeed += speed / 2;
     }
 
     private void Update()

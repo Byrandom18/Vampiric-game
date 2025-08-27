@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16c19875bfb10f34aa23e93c79965d6a, type: 3}
+  m_Name: DamageMod
+  m_EditorClassIdentifier: 
+  cardName: "\u0410\u0431\u0441\u043E\u043B\u044E\u0442\u043D\u043E\u0435 \u0443\u0441\u0438\u043B\u0435\u043D\u0438\u0435"
+  description: "\u041E\u0431\u0449\u0438\u0439 \u0443\u0440\u043E\u043D {stat}%"
+  icon: {fileID: -3860048206728724737, guid: 6cd194515715c524aa4bc870dfe13a7c, type: 3}
+  maxLevel: 4
+  weaponType: 0
+  isWeaponUnlock: 0
+  damageMultiplier: 1
+  speedMultiplier: 1
+  lifetimeMultiplier: 1
+  sizeMultiplier: 1
+  intervalMultiplier: 1
+  penetrateAdd: 0
+  countAdd: 0
+  defShredAdd: 0
+  statType: 5
+  statValue: 5
+  requiredLevel: 3
+  requiredCards: []

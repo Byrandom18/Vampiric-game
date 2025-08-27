@@ -10,14 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 16c19875bfb10f34aa23e93c79965d6a, type: 3}
-  m_Name: Cone unlock
+  m_Name: HealthBase
   m_EditorClassIdentifier: 
-  cardName: Cone
-  description: unlock cone weapon
-  icon: {fileID: 6958571527567373106, guid: 94b1345f713a12346b67334adfba0adc, type: 3}
-  maxLevel: 1
+  cardName: "\u0411\u0430\u0437\u043E\u0432\u043E\u0435 \u0437\u0434\u043E\u0440\u043E\u0432\u044C\u0435"
+  description: "\u0411\u0430\u0437\u043E\u0432\u043E\u0435 \u0437\u0434\u043E\u0440\u043E\u0432\u044C\u0435
+    {stat}"
+  icon: {fileID: -5152954371445955299, guid: 6cd194515715c524aa4bc870dfe13a7c, type: 3}
+  maxLevel: 3
   weaponType: 0
-  isWeaponUnlock: 1
+  isWeaponUnlock: 0
   damageMultiplier: 1
   speedMultiplier: 1
   lifetimeMultiplier: 1
@@ -27,4 +28,6 @@ MonoBehaviour:
   countAdd: 0
   defShredAdd: 0
   statType: 0
-  statValue: 0
+  statValue: 10
+  requiredLevel: 3
+  requiredCards: []

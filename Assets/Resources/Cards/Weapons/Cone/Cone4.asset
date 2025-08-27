@@ -10,21 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 16c19875bfb10f34aa23e93c79965d6a, type: 3}
-  m_Name: Player damage
+  m_Name: Cone4
   m_EditorClassIdentifier: 
-  cardName: Attack mod
-  description: add damage {stat}
-  icon: {fileID: -7583409310137716746, guid: 94b1345f713a12346b67334adfba0adc, type: 3}
-  maxLevel: 5
+  cardName: "\u0411\u044B\u0441\u0442\u0440\u0430\u044F \u0441\u043C\u0435\u043D\u0430"
+  description: "\u0423\u0440\u043E\u043D {dmg}\n\u041F\u0435\u0440\u0435\u0437\u0430\u0440\u044F\u0434\u043A\u0430
+    {cd}"
+  icon: {fileID: 6410573742153609378, guid: 6cd194515715c524aa4bc870dfe13a7c, type: 3}
+  maxLevel: 1
   weaponType: 0
   isWeaponUnlock: 0
-  damageMultiplier: 1
+  damageMultiplier: 1.1
   speedMultiplier: 1
   lifetimeMultiplier: 1
   sizeMultiplier: 1
-  intervalMultiplier: 1
+  intervalMultiplier: 0.8
   penetrateAdd: 0
   countAdd: 0
   defShredAdd: 0
   statType: 0
-  statValue: 5
+  statValue: 0
+  requiredLevel: 1
+  requiredCards:
+  - {fileID: 11400000, guid: 2b97ae62e2233334bb7839c89e516301, type: 2}

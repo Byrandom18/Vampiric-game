@@ -90,7 +90,7 @@ public class SpreadScript : WeaponBase
         {
             float finalSpeed = currentSpeed * (stats != null ? (1 + stats.projectileSpeed / 100) : 1f);
             float finalLifetime = currentLifetime * (stats != null ? (1 + stats.durations / 100) : 1f);
-            float finalDamage = currentDamage * (stats != null ? stats.atk : 1f);
+            float finalDamage = currentDamage * (stats != null ? stats.atk : 1f) * (stats != null ? (1 + stats.damageMod / 100) : 1f);
             int finalPenetrate = currentPenetrate + (stats != null ? stats.penetrationBoost : 0);
             float finalDefShred = currentDefShred + (stats != null ? stats.defShred : 0f);
 

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16c19875bfb10f34aa23e93c79965d6a, type: 3}
+  m_Name: Cone6
+  m_EditorClassIdentifier: 
+  cardName: "\u0410\u0431\u0441\u043E\u043B\u044E\u0442\u043D\u044B\u0439 \u0412\u0435\u0435\u0440"
+  description: "\u0423\u0440\u043E\u043D {dmg}\n\u0421\u043D\u0430\u0440\u044F\u0434\u043E\u0432
+    {count}\n\u041F\u0440\u043E\u0431\u0438\u0442\u0438\u0435 {pen}\n\u041F\u0435\u0440\u0435\u0437\u0430\u0440\u044F\u0434\u043A\u0430
+    {cd}"
+  icon: {fileID: 6410573742153609378, guid: 6cd194515715c524aa4bc870dfe13a7c, type: 3}
+  maxLevel: 1
+  weaponType: 0
+  isWeaponUnlock: 0
+  damageMultiplier: 1.3
+  speedMultiplier: 1
+  lifetimeMultiplier: 1
+  sizeMultiplier: 1
+  intervalMultiplier: 0.9
+  penetrateAdd: 1
+  countAdd: 1
+  defShredAdd: 0
+  statType: 0
+  statValue: 0
+  requiredLevel: 1
+  requiredCards:
+  - {fileID: 11400000, guid: 82f47e79aa407d941af7590c69d8dba9, type: 2}

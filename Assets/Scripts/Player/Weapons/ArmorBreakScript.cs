@@ -85,7 +85,7 @@ public class ArmorBreakScript : WeaponBase
     private void SpawnProjectiles(Vector2 mainDirection)
     {
         int projectileCount = currentCount + (stats != null ? stats.addProjectile : 0);
-        float damageMultiplier = 1f + (projectileCount / 2f);
+        float damageMultiplier = 1f + ((projectileCount - 1) / 2f);
         float newDamage = currentDamage * damageMultiplier;
 
         SpawnSingleProjectile(mainDirection, newDamage);
@@ -109,10 +109,11 @@ public class ArmorBreakScript : WeaponBase
             float finalLifetime = currentLifetime * (stats != null ? (1 + stats.durations / 100) : 1f);
             int finalPenetrate = currentPenetrate + (stats != null ? stats.penetrationBoost : 0);
             float finalDefShred = currentDefShred + (stats != null ? stats.defShred : 0f);
+            float finalDamage = damage * (stats != null ? stats.atk : 1f) * (stats != null ? (1 + stats.damageMod / 100) : 1f);
 
             projectileScript.speed = finalSpeed;
             projectileScript.lifetime = finalLifetime;
-            projectileScript.damage = damage;
+            projectileScript.damage = finalDamage;
             projectileScript.penetrate = finalPenetrate;
             projectileScript.defShred = finalDefShred;
             projectileScript.SetDirection(direction);

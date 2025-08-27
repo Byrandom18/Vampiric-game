@@ -18,7 +18,7 @@ public class ExplosiveEnemy : MonoBehaviour
     public void Death()
     {
         CreateExplosion(transform.position);
-        Destroy(gameObject);
+        //Destroy(gameObject);
     }
 
     public void CreateExplosion(Vector2 position)

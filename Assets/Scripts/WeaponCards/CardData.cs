@@ -1,7 +1,23 @@
 using UnityEngine;
 
 public enum WeaponType { Cone, Spread, ArmorBreak, Minigun, Homing, Bouncing }
-public enum StatType { Damage, Speed, Health, Crit, Area, Duration, Penetration, ProjectileSpeed }
+public enum StatType { BaseHealth,
+HealthMod,
+HealthRegen,
+BaseAtk,
+AtkMod,
+DamageMod,
+Luck,
+CritRate,
+CritDamage,
+Def,
+PenetrationBoost,
+ProjectileSpeed,
+Durations,
+CdRed,
+AddProjectile,
+AreaMod,
+DefShred }
 
 [CreateAssetMenu(fileName = "New Card", menuName = "Cards/Card Data")]
 public class CardData : ScriptableObject
@@ -10,7 +26,7 @@ public class CardData : ScriptableObject
     public string cardName;
     [TextArea] public string description;
     public Sprite icon;
-    public int maxLevel = 5;
+    public int maxLevel = 1;
 
     [Header("Weapon Unlock/Upgrade")]
     public WeaponType weaponType;

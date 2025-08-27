@@ -189,11 +189,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7c41e48430f3ee4185f419e45be2971, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  expPrefab: {fileID: 6289964696067862102, guid: f0fda27dff8e1f0468b27d452cb57a4e, type: 3}
   damage: 1
   health: 20
   defence: 0
   damageColor: {r: 1, g: 0, b: 0, a: 1}
-  healColor: {r: 0, g: 1, b: 0, a: 1}
   textSize: 3.5
 --- !u!70 &8130619371559947347
 CapsuleCollider2D:
