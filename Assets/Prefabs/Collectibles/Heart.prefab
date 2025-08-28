@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6374929081666592825}
   - component: {fileID: 7542508736178386234}
   - component: {fileID: 6175263439531170118}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Heart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,8 +131,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 3
   value: 1
+  minValue: 1
+  maxValue: 1
+  mergeRadius: 1.5
+  mergeCheckInterval: 0.3
+  spriteRenderer: {fileID: 0}
+  expColor: {r: 0, g: 0, b: 1, a: 1}
+  goldColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  magnetColor: {r: 0, g: 1, b: 1, a: 1}
+  heartColor: {r: 1, g: 0, b: 0, a: 1}
+  bombColor: {r: 0, g: 0, b: 0, a: 1}
+  gemColor: {r: 1, g: 0, b: 1, a: 1}
+  mergeEffect: {fileID: 0}
+  initialWaitTime: 0.5
   attractionRadius: 2
-  speed: 8
+  baseSpeed: 8
+  maxSpeed: 15
+  acceleration: 2
+  explosionRadius: 5
+  bombDamageMod: 5
+  explosionEffect: {fileID: 0}
 --- !u!58 &6175263439531170118
 CircleCollider2D:
   m_ObjectHideFlags: 0

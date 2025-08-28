@@ -170,12 +170,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0bc256ca7a1b9e46a6d20b34445f9d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
-  canClosing: 1
+  baseSpeed: 2
+  damage: 10
+  enableClosing: 1
   closingDistance: 3
-  forceDuration: 1
+  forceDuration: 0.7
   forceCD: 5
   forcePower: 2
+  updateInterval: 0.1
+  teleportDistance: 30
 --- !u!114 &2406425240035520855
 MonoBehaviour:
   m_ObjectHideFlags: 0

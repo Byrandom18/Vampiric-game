@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2837325317356819217}
   - component: {fileID: 3609611624562526960}
   - component: {fileID: 5030477138663310845}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Exp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,8 +131,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 0
   value: 1
+  minValue: 1
+  maxValue: 1
+  mergeRadius: 1.5
+  mergeCheckInterval: 5
+  initialWaitTime: 0.5
   attractionRadius: 2
-  speed: 8
+  baseSpeed: 8
+  maxSpeed: 15
+  acceleration: 2
+  explosionRadius: 5
+  bombDamageMod: 5
+  explosionEffect: {fileID: 0}
+  mergeEffect: {fileID: 0}
 --- !u!58 &5030477138663310845
 CircleCollider2D:
   m_ObjectHideFlags: 0

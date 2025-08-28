@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63ebb9b64be93524a8a62deecca6560c, type: 3}
+  m_Name: MushWave
+  m_EditorClassIdentifier: 
+  waveName: Mushroom Wave
+  waveNumber: 1
+  waveType: 0
+  enemyPrefab: {fileID: 3100729181797172739, guid: cd7fa9e388a045d47b024a83e715c1a8, type: 3}
+  minEnemyLevel: 1
+  maxEnemyLevel: 1
+  minEnemies: 50
+  maxEnemies: 100
+  spawnMode: 0
+  spawnInterval: 0
+  spawnDuration: 30
+  delayAfterWave: 5
+  timeBetweenSpawnGroups: 0
+  spawnRadius: 15
+  minSpawnDistance: 12
+  spawnAroundPlayer: 1
+  spawnPattern: 0
+  healthMultiplier: 1
+  damageMultiplier: 1
+  speedMultiplier: 1
+  defenseBonus: 0
+  eliteChance: 0.1
+  eliteEnemyPrefab: {fileID: 0}
+  eliteHealthMultiplier: 2
+  eliteDamageMultiplier: 1.5
+  eliteColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  baseExpReward: 100
+  minCurrencyReward: 10
+  maxCurrencyReward: 20
+  itemDropChance: 0.3
+  possibleItemDrops: []
+  spawnEffect: {fileID: 0}
+  waveColor: {r: 1, g: 1, b: 1, a: 1}
+  waveStartSound: {fileID: 0}
+  waveEndSound: {fileID: 0}
+  spawnBoss: 0
+  bossPrefab: {fileID: 0}
+  bossSpawnThreshold: 20

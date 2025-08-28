@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6730590313485505262}
   - component: {fileID: 4085234050344973968}
   - component: {fileID: 631051239334410326}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Bomb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,10 +104,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 4
   value: 1
+  minValue: 1
+  maxValue: 1
+  mergeRadius: 1.5
+  mergeCheckInterval: 0.3
+  spriteRenderer: {fileID: 0}
+  expColor: {r: 0, g: 0, b: 1, a: 1}
+  goldColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  magnetColor: {r: 0, g: 1, b: 1, a: 1}
+  heartColor: {r: 1, g: 0, b: 0, a: 1}
+  bombColor: {r: 0, g: 0, b: 0, a: 1}
+  gemColor: {r: 1, g: 0, b: 1, a: 1}
+  mergeEffect: {fileID: 0}
+  initialWaitTime: 0.5
   attractionRadius: 2
-  speed: 8
+  baseSpeed: 8
+  maxSpeed: 15
+  acceleration: 2
   explosionRadius: 8
   bombDamageMod: 5
+  explosionEffect: {fileID: 0}
 --- !u!50 &4085234050344973968
 Rigidbody2D:
   serializedVersion: 5
