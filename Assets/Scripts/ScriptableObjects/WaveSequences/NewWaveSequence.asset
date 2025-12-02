@@ -16,20 +16,20 @@ MonoBehaviour:
   - waveConfig: {fileID: 11400000, guid: ba14b53d29b57e847825eacf3816c024, type: 2}
     waitForAllEnemiesDead: 0
     timeBeforeNextWave: 5
-    waveDuration: 10
+    waveDuration: 5
   - waveConfig: {fileID: 11400000, guid: 0848edf5c240277498511058234ca412, type: 2}
     waitForAllEnemiesDead: 0
     timeBeforeNextWave: 10
-    waveDuration: 60
+    waveDuration: 5
   - waveConfig: {fileID: 11400000, guid: 7ac46bc5115ca47488a7f3d42af5654e, type: 2}
     waitForAllEnemiesDead: 0
     timeBeforeNextWave: 10
-    waveDuration: 60
+    waveDuration: 5
   difficultyScalePerWave: 1.1
   maxActiveEnemies: 1000
   startingWaveNumber: 1
   infiniteWaves: 0
   wavesBeforeBoss: 5
   bossWaveTemplate: {fileID: 0}
-  expRewardPerWave: 50
-  currencyRewardPerWave: 10
+  expRewardPerWave: 0
+  currencyRewardPerWave: 0
