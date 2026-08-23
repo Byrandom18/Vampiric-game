@@ -1,13 +1,18 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using System;
+using Vampiric.Game;
+using Vampiric.Meta;
+using Vampiric.Stats;
 
 public class PlayerStats : MonoBehaviour
 {
     public static PlayerStats Instance;
     public static event System.Action<Transform> OnPlayerSpawned;
     public static event System.Action OnPlayerDeath;
+    public StatSheet Sheet { get; private set; } = new StatSheet();
 
     [Header("UI Elements")]
     public Slider healthBar;
@@ -16,7 +21,7 @@ public class PlayerStats : MonoBehaviour
     public Text gemsText;
     public ExpBar expBar;
 
-    [Header("Боевые характеристики")]
+    [Header(" ")]
     public float health = 100;
     public float baseHealth = 100;
     public float healthMod;
@@ -40,7 +45,7 @@ public class PlayerStats : MonoBehaviour
     public float defShred;
     public bool invulnerability = false;
 
-    [Header("Вспомогательные характеристики")]
+    [Header(" ")]
     public float maxExp = 5;
     public float exp;
     public float expIncrease = 10;
@@ -50,18 +55,18 @@ public class PlayerStats : MonoBehaviour
     public int killCount;
     public int wavesCompleted;
 
-    [Header("Настройки сложности и прогрессии")]
+    [Header("   ")]
     public float difficultyChange = 1;
     public float difficultyMod = 0f;
     public float difficultyDelay = 30f;
     public float survivalTime = 0f;
 
-    [Header("Модификаторы опыта и дропа")]
+    [Header("   ")]
     public float expGainMultiplier = 1f;
     public float goldGainMultiplier = 1f;
     public float itemDropChanceMultiplier = 1f;
 
-    // События для UI и других систем
+    //   UI   
     public event Action OnHealthChanged;
     public event Action OnLevelUp;
     public event Action OnStatsUpdated;
@@ -97,9 +102,62 @@ public class PlayerStats : MonoBehaviour
 
     private void InitializeStats()
     {
-        atk = baseAtk * (1 + atkMod / 100);
-        maxHealth = baseHealth * (1 + healthMod / 100);
+        PushBasesToSheet();
+        RefreshDerivedStats();
         health = maxHealth;
+    }
+
+    private void PushBasesToSheet()
+    {
+        Sheet.SetBase(StatId.BaseHealth, baseHealth);
+        Sheet.SetBase(StatId.HealthMod, healthMod);
+        Sheet.SetBase(StatId.HealthRegen, healthRegen);
+        Sheet.SetBase(StatId.BaseAttack, baseAtk);
+        Sheet.SetBase(StatId.AttackMod, atkMod);
+        Sheet.SetBase(StatId.DamageMod, damageMod);
+        Sheet.SetBase(StatId.Luck, luck);
+        Sheet.SetBase(StatId.CritRate, critRate);
+        Sheet.SetBase(StatId.CritDamage, critDamage);
+        Sheet.SetBase(StatId.Defense, def);
+        Sheet.SetBase(StatId.Penetration, penetrationBoost);
+        Sheet.SetBase(StatId.ProjectileSpeed, projectileSpeed);
+        Sheet.SetBase(StatId.Durations, durations);
+        Sheet.SetBase(StatId.CooldownReduction, cdRed);
+        Sheet.SetBase(StatId.ExtraProjectiles, addProjectile);
+        Sheet.SetBase(StatId.AreaMod, areaMod);
+        Sheet.SetBase(StatId.DefenseShred, defShred);
+        Sheet.SetBase(StatId.ExpMod, (expGainMultiplier - 1f) * 100f);
+        Sheet.SetBase(StatId.GoldMod, (goldGainMultiplier - 1f) * 100f);
+    }
+
+    public void RefreshDerivedStats()
+    {
+        Sheet.Recalculate();
+        atk = Sheet.ToRuntime(default, invulnerability, false).Attack;
+        healthMod = Sheet.Get(StatId.HealthMod);
+        damageMod = Sheet.Get(StatId.DamageMod);
+        critRate = Sheet.Get(StatId.CritRate);
+        critDamage = Sheet.Get(StatId.CritDamage);
+        def = Sheet.Get(StatId.Defense);
+        healthRegen = Sheet.Get(StatId.HealthRegen);
+        cdRed = Sheet.Get(StatId.CooldownReduction);
+        addProjectile = Mathf.RoundToInt(Sheet.Get(StatId.ExtraProjectiles));
+        areaMod = Sheet.Get(StatId.AreaMod);
+        defShred = Sheet.Get(StatId.DefenseShred);
+        projectileSpeed = Sheet.Get(StatId.ProjectileSpeed);
+        durations = Sheet.Get(StatId.Durations);
+        penetrationBoost = Mathf.RoundToInt(Sheet.Get(StatId.Penetration));
+        expGainMultiplier = 1f + Sheet.Get(StatId.ExpMod) / 100f;
+        goldGainMultiplier = 1f + Sheet.Get(StatId.GoldMod) / 100f;
+        maxHealth = (baseHealth + Sheet.Get(StatId.HealthFlat)) * (1f + healthMod / 100f);
+        health = Mathf.Min(health, maxHealth);
+        UpdateAllUI();
+        OnStatsUpdated?.Invoke();
+    }
+
+    private void LateUpdate()
+    {
+        SimulationDriver.Instance?.SyncPlayerFromStats(this, Sheet);
     }
 
     private void StartCoroutines()
@@ -134,7 +192,7 @@ public class PlayerStats : MonoBehaviour
         {
             yield return new WaitForSeconds(difficultyDelay);
             difficultyMod += difficultyChange;
-            Debug.Log($"Сложность увеличена: {difficultyMod}");
+            Debug.Log($" : {difficultyMod}");
         }
     }
 
@@ -149,43 +207,52 @@ public class PlayerStats : MonoBehaviour
 
     public void UpgradeStat(StatType statType, float value)
     {
-        switch (statType)
+        StatId id = statType switch
         {
-            case StatType.BaseHealth: baseHealth += value; break;
-            case StatType.HealthMod: healthMod += value; break;
-            case StatType.HealthRegen: healthRegen += value; break;
-            case StatType.BaseAtk: baseAtk += value; break;
-            case StatType.AtkMod: atkMod += value; break;
-            case StatType.DamageMod: damageMod += value; break;
-            case StatType.Luck: luck += value; break;
-            case StatType.CritRate: critRate = critRate + value; break;
-            case StatType.CritDamage: critDamage += value; break;
-            case StatType.Def: def += value; break;
-            case StatType.PenetrationBoost: penetrationBoost += Mathf.RoundToInt(value); break;
-            case StatType.ProjectileSpeed: projectileSpeed += value; break;
-            case StatType.Durations: durations += value; break;
-            case StatType.CdRed: cdRed = Mathf.Min(99f, cdRed + value); break;
-            case StatType.AddProjectile: addProjectile += Mathf.RoundToInt(value); break;
-            case StatType.AreaMod: areaMod += value; break;
-            case StatType.DefShred: defShred += value; break;
-            //case StatType.ExpGain: expGainMultiplier += value / 100f; break;
-            //case StatType.GoldGain: goldGainMultiplier += value / 100f; break;
-            //case StatType.DropChance: itemDropChanceMultiplier += value / 100f; break;
+            StatType.BaseHealth => StatId.BaseHealth,
+            StatType.HealthMod => StatId.HealthMod,
+            StatType.HealthRegen => StatId.HealthRegen,
+            StatType.BaseAtk => StatId.BaseAttack,
+            StatType.AtkMod => StatId.AttackMod,
+            StatType.DamageMod => StatId.DamageMod,
+            StatType.Luck => StatId.Luck,
+            StatType.CritRate => StatId.CritRate,
+            StatType.CritDamage => StatId.CritDamage,
+            StatType.Def => StatId.Defense,
+            StatType.PenetrationBoost => StatId.Penetration,
+            StatType.ProjectileSpeed => StatId.ProjectileSpeed,
+            StatType.Durations => StatId.Durations,
+            StatType.CdRed => StatId.CooldownReduction,
+            StatType.AddProjectile => StatId.ExtraProjectiles,
+            StatType.AreaMod => StatId.AreaMod,
+            StatType.DefShred => StatId.DefenseShred,
+            _ => StatId.None
+        };
+
+        if (id != StatId.None)
+        {
+            if (id == StatId.BaseHealth)
+            {
+                baseHealth += value;
+                Sheet.SetBase(StatId.BaseHealth, baseHealth);
+            }
+            else if (id == StatId.BaseAttack)
+            {
+                baseAtk += value;
+                Sheet.SetBase(StatId.BaseAttack, baseAtk);
+            }
+            else
+            {
+                Sheet.AddModifier(StatSheet.CardSource, new StatModifier(id, value));
+            }
         }
 
-        UpdateStats();
+        RefreshDerivedStats();
     }
 
     private void UpdateStats()
     {
-        atk = baseAtk * (1 + atkMod / 100) * (1 + damageMod / 100);
-        maxHealth = baseHealth * (1 + healthMod / 100);
-
-        // Ограничиваем здоровье, если максимум уменьшился
-        health = Mathf.Min(health, maxHealth);
-
-        UpdateAllUI();
-        OnStatsUpdated?.Invoke();
+        RefreshDerivedStats();
     }
 
     public void TakeDamage(float damage)
@@ -193,7 +260,7 @@ public class PlayerStats : MonoBehaviour
         if (isDead || invulnerability) return;
 
         damage -= def;
-        damage = Mathf.Max(1f, damage * (1 - def / (def + 100f))); // Формула уменьшения урона от защиты
+        damage = Mathf.Max(1f, damage * (1 - def / (def + 100f))); //     
 
         health -= damage;
         health = Mathf.Max(0, health);
@@ -211,20 +278,19 @@ public class PlayerStats : MonoBehaviour
     {
         isDead = true;
 
-        // Останавливаем все корутины
+        //   
         if (healthRegenCoroutine != null) StopCoroutine(healthRegenCoroutine);
         if (difficultyCoroutine != null) StopCoroutine(difficultyCoroutine);
         if (survivalTimerCoroutine != null) StopCoroutine(survivalTimerCoroutine);
 
-        // Вызываем событие смерти
+        //   
         OnDeath?.Invoke();
-        OnPlayerDeath?.Invoke(); // <- НОВОЕ событие
-
-        //// Показываем экран смерти
-        //if (GameManager.Instance != null)
-        //{
-        //    GameManager.Instance.ShowDeathScreen();
-        //}
+        OnPlayerDeath?.Invoke();
+        ProfileState.Current?.CommitFinishedRun(gold, gems);
+        if (Application.CanStreamedLevelBeLoaded("Hub"))
+        {
+            SceneManager.LoadScene("Hub");
+        }
     }
 
     public void Revive(float healthPercent = 0.5f)
@@ -296,18 +362,18 @@ public class PlayerStats : MonoBehaviour
         lvl++;
         exp -= maxExp;
 
-        // Увеличиваем требуемый опыт
+        //   
         if (lvl % 10 == 0)
             expIncrease += 2;
         maxExp += expIncrease;
 
-        // Восстанавливаем немного здоровья при уровне
+        //     
         AddHealth(maxHealth * 0.1f);
 
         UpdateAllUI();
         OnLevelUp?.Invoke();
 
-        // Вызываем систему выбора карточек
+        //    
         if (CardSelectionSystem.Instance != null)
         {
             CardSelectionSystem.Instance.ShowCardSelection();
@@ -384,12 +450,13 @@ public class PlayerStats : MonoBehaviour
         return totalDamage;
     }
 
-    // Метод для сброса статов (при новой игре)
+    //     (  )
     public void ResetStats()
     {
+        Sheet = new StatSheet();
         isDead = false;
 
-        // Сбрасываем базовые характеристики
+        //   
         baseHealth = 100;
         healthMod = 0;
         baseAtk = 10;
@@ -401,7 +468,7 @@ public class PlayerStats : MonoBehaviour
         def = 0;
         healthRegen = 0;
 
-        // Сбрасываем прогрессию
+        //  
         lvl = 1;
         exp = 0;
         maxExp = 5;
@@ -419,7 +486,7 @@ public class PlayerStats : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Отписываемся от всех событий при уничтожении
+        //      
         OnHealthChanged = null;
         OnLevelUp = null;
         OnStatsUpdated = null;
@@ -427,7 +494,7 @@ public class PlayerStats : MonoBehaviour
     }
 }
 
-// Расширенное перечисление типов статов
+//    
 //public enum StatType
 //{
 //    BaseHealth,

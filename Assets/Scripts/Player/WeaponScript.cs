@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Linq;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public class WeaponScript : MonoBehaviour
@@ -40,7 +38,6 @@ public class WeaponScript : MonoBehaviour
 
     private void Update()
     {
-        WeaponTrigger();
     }
 
     public void WeaponTrigger()
@@ -101,20 +98,20 @@ public class WeaponScript : MonoBehaviour
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
         if (enemies.Length == 0) return null;
 
-        // Фильтруем null объекты
+        //  null 
         var validEnemies = enemies.Where(enemy => enemy != null).ToArray();
         if (validEnemies.Length == 0) return null;
 
-        // Выбираем случайного врага
+        //   
         int randomIndex = Random.Range(0, validEnemies.Length);
         return validEnemies[randomIndex];
     }
 
 
-    // Или возвращаем GameObject с направлением (если нужно)
+    //   GameObject   ( )
     public GameObject GetMouseDirectionAsTarget()
     {
-        // Создаем временный объект для представления направления мыши
+        //       
         GameObject mouseTarget = new GameObject("MouseTarget");
         mouseTarget.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Destroy(mouseTarget, 1f);
@@ -158,11 +155,11 @@ public class WeaponScript : MonoBehaviour
         {
             if (enemy == null) continue;
 
-            // Получаем компонент здоровья врага
+            //    
             EnemyDamage enemyDamage = enemy.GetComponent<EnemyDamage>();
             if (enemyDamage == null) continue;
 
-            // Сравниваем здоровье
+            //  
             if (enemyDamage.health > maxHealth)
             {
                 maxHealth = enemyDamage.health;
@@ -179,7 +176,7 @@ public class WeaponScript : MonoBehaviour
     {
         GameObject projectile = Instantiate(projectilePrefab, playerTransform.position, Quaternion.identity);
 
-        // Поворачиваем снаряд в направлении движения
+        //     
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         projectile.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 

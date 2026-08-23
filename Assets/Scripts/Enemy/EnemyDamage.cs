@@ -222,15 +222,7 @@ public class EnemyDamage : MonoBehaviour
 
     private void HandleDeath()
     {
-        // Если есть менеджер пула, используем его, иначе уничтожаем объект
-        if (EnemyPoolManager.Instance != null)
-        {
-            EnemyPoolManager.Instance.ReturnEnemyToPool(this);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        ReturnToPool();
     }
 
     // Метод для возврата в пул (вызывается из менеджера пула)

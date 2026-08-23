@@ -1,128 +1,121 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private Rigidbody2D rb;
-    [SerializeField] private float speed = 3f;
-    private SpriteRenderer sprite;
-    private InputSystem_Actions inputActions;
-    private PlayerStats stats;
-
     public static PlayerMovement Instance { get; private set; }
 
-    [Header("Dodge Settings")]
-    [SerializeField] private float dodgePower = 10f; // Сила рывка
+    [SerializeField] private float speed = 3f;
+    [SerializeField] private float dodgePower = 10f;
     [SerializeField] private float dodgeDuration = 0.2f;
     [SerializeField] private float cooldown = 5f;
-    
-    private bool isDodging = false;
-    private bool canDodge = true;
-    private Vector2 lastMovementDirection = Vector2.right;
+
+    private Rigidbody2D _rigidbody;
+    private SpriteRenderer _sprite;
+    private InputSystem_Actions _inputActions;
+    private PlayerStats _stats;
+    private bool _isDodging;
+    private bool _canDodge = true;
+    private Vector2 _lastMovementDirection = Vector2.right;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        sprite = GetComponent<SpriteRenderer>();
+        _rigidbody = GetComponent<Rigidbody2D>();
+        _sprite = GetComponent<SpriteRenderer>();
         Instance = this;
-        stats = GetComponent<PlayerStats>();
+        _stats = GetComponent<PlayerStats>();
     }
 
     private void Start()
     {
-        inputActions = new InputSystem_Actions();
-        inputActions.Enable();
-        inputActions.Player.Dodge.performed += OnDodgeInput;
+        _inputActions = new InputSystem_Actions();
+        _inputActions.Enable();
+        _inputActions.Player.Dodge.performed += OnDodgeInput;
     }
 
     private void Update()
     {
-        if (!isDodging)
+        if (_isDodging)
         {
-            Move();
-            UpdateSpriteDirection();
+            return;
         }
+
+        Move();
+        UpdateSpriteDirection();
     }
 
     private void Move()
     {
-        Vector2 inputVector = GetMovementVector();
-
-        if (inputVector != Vector2.zero)
+        Vector2 input = GetMovementVector();
+        if (input != Vector2.zero)
         {
-            lastMovementDirection = inputVector;
+            _lastMovementDirection = input;
         }
 
-        rb.linearVelocity = inputVector * speed;
+        _rigidbody.linearVelocity = input * speed;
     }
 
     private void UpdateSpriteDirection()
     {
-        if (rb.linearVelocity.x < -0.1f)
+        if (_rigidbody.linearVelocity.x < -0.1f)
         {
-            sprite.transform.localScale = new Vector3(-1, 1, 1);
+            _sprite.transform.localScale = new Vector3(-1f, 1f, 1f);
         }
-        else if (rb.linearVelocity.x > 0.1f)
+        else if (_rigidbody.linearVelocity.x > 0.1f)
         {
-            sprite.transform.localScale = new Vector3(1, 1, 1);
+            _sprite.transform.localScale = new Vector3(1f, 1f, 1f);
         }
     }
 
     private Vector2 GetMovementVector()
     {
-        return inputActions.Player.Move.ReadValue<Vector2>();
+        return _inputActions.Player.Move.ReadValue<Vector2>();
     }
 
     private void OnDodgeInput(InputAction.CallbackContext context)
     {
-        if (canDodge && !isDodging)
+        if (_canDodge && !_isDodging)
         {
             StartCoroutine(PerformDodge());
         }
     }
-    
+
     private IEnumerator PerformDodge()
     {
-        // Подготовка
-        canDodge = false;
-        isDodging = true;
-        stats.invulnerability = true;
-        // Определяем направление
+        _canDodge = false;
+        _isDodging = true;
+        if (_stats != null)
+        {
+            _stats.invulnerability = true;
+        }
+
         Vector2 dodgeDirection = GetMovementVector();
         if (dodgeDirection == Vector2.zero)
         {
-            dodgeDirection = lastMovementDirection;
+            dodgeDirection = _lastMovementDirection;
         }
 
-
-        // Применяем рывок через velocity
-        rb.linearVelocity = dodgeDirection * dodgePower;
-
-        // Ждем duration
+        _rigidbody.linearVelocity = dodgeDirection * dodgePower;
         yield return new WaitForSeconds(dodgeDuration);
-        
-        // Возвращаем обычную скорость (если игрок держит кнопку движения)
-        if (!isDodging) // Дополнительная проверка на случай прерывания
+        _isDodging = false;
+        if (_stats != null)
         {
-            rb.linearVelocity = GetMovementVector() * speed;
+            _stats.invulnerability = false;
         }
 
-        // Завершение
-        isDodging = false;
-        stats.invulnerability = false;
-        // Перезарядка
         yield return new WaitForSeconds(cooldown);
-        canDodge = true;
-        
+        _canDodge = true;
     }
 
     private void OnDisable()
     {
-        if (inputActions != null)
+        if (_inputActions == null)
         {
-            inputActions.Player.Dodge.performed -= OnDodgeInput;
-            inputActions.Disable();
+            return;
         }
+
+        _inputActions.Player.Dodge.performed -= OnDodgeInput;
+        _inputActions.Disable();
     }
 }

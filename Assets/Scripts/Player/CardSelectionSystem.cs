@@ -44,11 +44,6 @@ public class CardSelectionSystem : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        InitializeSystem();
-    }
-
     private void Update()
     {
         if (isSelecting && useTimer)
@@ -71,7 +66,7 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Показывает панель выбора карточек при получении уровня
+    ///       
     /// </summary>
     public void ShowCardSelection()
     {
@@ -81,27 +76,27 @@ public class CardSelectionSystem : MonoBehaviour
         isSelecting = true;
         selectionTimer = selectionTime;
 
-        // Активируем панель
+        //  
         if (cardSelectionPanel != null)
         {
             cardSelectionPanel.SetActive(true);
         }
 
-        // Обновляем текст
+        //  
         UpdateLevelUpText();
 
-        // Показываем таймер
+        //  
         if (timerFillImage != null && useTimer)
         {
             timerFillImage.gameObject.SetActive(true);
             timerFillImage.fillAmount = 1f;
         }
 
-        // Генерируем и отображаем карточки
+        //    
         GenerateCardOptions();
         DisplayCards();
 
-        // Запускаем корутину таймера
+        //   
         if (useTimer)
         {
             selectionCoroutine = StartCoroutine(SelectionTimerCoroutine());
@@ -109,21 +104,21 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Генерирует доступные варианты карточек
+    ///    
     /// </summary>
     private void GenerateCardOptions()
     {
         currentCardOptions.Clear();
 
-        // Получаем доступные карты
+        //   
         List<CardData> availableCards = GetAvailableCards();
 
-        // Если карт меньше чем нужно показать - показываем все
+        //       -  
         int cardsCount = Mathf.Min(cardsToShow, availableCards.Count);
 
         for (int i = 0; i < cardsCount; i++)
         {
-            // Выбираем случайную карту из доступных
+            //     
             int randomIndex = Random.Range(0, availableCards.Count);
             CardData selectedCard = availableCards[randomIndex];
 
@@ -133,7 +128,7 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Возвращает список доступных для выбора карт
+    ///      
     /// </summary>
     private List<CardData> GetAvailableCards()
     {
@@ -151,13 +146,75 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Проверяет, доступна ли карта для выбора
+    /// ,     
     /// </summary>
+    private void Start()
+    {
+        InitializeSystem();
+        InjectGeneratedCards();
+    }
+
+    private void InjectGeneratedCards()
+    {
+        var grenade = ScriptableObject.CreateInstance<CardData>();
+        grenade.cardName = "";
+        grenade.description = "Unlock Grenade Weapon";
+        grenade.isWeaponUnlock = true;
+        grenade.weaponType = WeaponType.ArmorBreak;
+        grenade.resultWeaponId = (int)Vampiric.Weapons.WeaponId.Grenade;
+        grenade.maxLevel = 1;
+        allCards.Add(grenade);
+
+        var catalog = Vampiric.Game.GameContentBootstrap.Instance != null
+            ? Vampiric.Game.GameContentBootstrap.Instance.Evolutions
+            : Vampiric.Weapons.WeaponEvolutionCatalog.CreateDefault();
+        foreach (var recipe in catalog.Recipes)
+        {
+            var card = ScriptableObject.CreateInstance<CardData>();
+            card.cardName = recipe.DisplayName;
+            card.description = recipe.Description;
+            card.isEvolution = true;
+            card.isWeaponUnlock = true;
+            card.firstWeaponId = (int)recipe.First;
+            card.secondWeaponId = (int)recipe.Second;
+            card.resultWeaponId = (int)recipe.Result;
+            card.maxLevel = 1;
+            allCards.Add(card);
+        }
+    }
+
     private bool IsCardAvailable(CardData card)
     {
-        
+        if (card == null)
+        {
+            return false;
+        }
 
-        // Для карт разблокировки оружия проверяем, не разблокировано ли уже оружие
+        if (PlayerStats.Instance != null && PlayerStats.Instance.lvl < card.requiredLevel)
+        {
+            return false;
+        }
+
+        if (card.isEvolution)
+        {
+            var loadout = Vampiric.Weapons.WeaponFireDirector.Instance?.Loadout;
+            if (loadout == null)
+            {
+                return false;
+            }
+
+            return loadout.IsMaxLevel((Vampiric.Weapons.WeaponId)card.firstWeaponId) &&
+                   loadout.IsMaxLevel((Vampiric.Weapons.WeaponId)card.secondWeaponId) &&
+                   !loadout.IsUnlocked((Vampiric.Weapons.WeaponId)card.resultWeaponId);
+        }
+
+        if (card.resultWeaponId == (int)Vampiric.Weapons.WeaponId.Grenade)
+        {
+            var loadout = Vampiric.Weapons.WeaponFireDirector.Instance?.Loadout;
+            return loadout != null && !loadout.IsUnlocked(Vampiric.Weapons.WeaponId.Grenade);
+        }
+
+        //     ,     
         if (card.isWeaponUnlock)
         {
             if (WeaponManager.Instance != null &&
@@ -167,7 +224,7 @@ public class CardSelectionSystem : MonoBehaviour
             }
         }
 
-        // Проверяем требования по другим картам
+        //     
         if (card.requiredCards != null && card.requiredCards.Length > 0)
         {
             foreach (CardData requiredCard in card.requiredCards)
@@ -180,7 +237,7 @@ public class CardSelectionSystem : MonoBehaviour
             }
         }
 
-        // Проверяем максимальный уровень
+        //   
         if (PlayerProgress.Instance != null)
         {
             int currentLevel = PlayerProgress.Instance.GetCardLevel(card);
@@ -194,14 +251,14 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Отображает карточки в UI
+    ///    UI
     /// </summary>
     private void DisplayCards()
     {
-        // Очищаем предыдущие карточки
+        //   
         ClearCurrentCards();
 
-        // Создаем новые карточки
+        //   
         foreach (CardData cardData in currentCardOptions)
         {
             GameObject cardInstance = Instantiate(cardPrefab, cardsContainer);
@@ -216,7 +273,7 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Очищает текущие карточки
+    ///   
     /// </summary>
     private void ClearCurrentCards()
     {
@@ -231,7 +288,7 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Обработчик выбора карточки игроком
+    ///    
     /// </summary>
     public void SelectCard(CardData selectedCard)
     {
@@ -242,20 +299,20 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Применяет эффект выбранной карточки
+    ///    
     /// </summary>
     private void ApplyCardEffect(CardData card)
     {
-        // Сохраняем в прогрессе
+        //   
         if (PlayerProgress.Instance != null)
         {
             PlayerProgress.Instance.AddSelectedCard(card);
         }
 
-        // Применяем эффект карты
+        //   
         if (card.isWeaponUnlock)
         {
-            // Разблокируем оружие
+            //  
             if (WeaponManager.Instance != null)
             {
                 WeaponManager.Instance.ApplyCardEffect(card);
@@ -263,7 +320,7 @@ public class CardSelectionSystem : MonoBehaviour
         }
         else if (card.statValue != 0)
         {
-            // Улучшаем статы игрока
+            //   
             if (PlayerStats.Instance != null)
             {
                 PlayerStats.Instance.UpgradeStat(card.statType, card.statValue);
@@ -271,19 +328,19 @@ public class CardSelectionSystem : MonoBehaviour
         }
         else
         {
-            // Улучшаем оружие
+            //  
             if (WeaponManager.Instance != null)
             {
                 WeaponManager.Instance.ApplyCardEffect(card);
             }
         }
 
-        // Воспроизводим звук или эффект
+        //    
         PlaySelectionEffect();
     }
 
     /// <summary>
-    /// Закрывает панель выбора
+    ///   
     /// </summary>
     private void CloseSelection()
     {
@@ -295,27 +352,27 @@ public class CardSelectionSystem : MonoBehaviour
         Time.timeScale = 1f;
         isSelecting = false;
 
-        // Деактивируем панель
+        //  
         if (cardSelectionPanel != null)
         {
             cardSelectionPanel.SetActive(false);
         }
 
-        // Скрываем таймер
+        //  
         if (timerFillImage != null)
         {
             timerFillImage.gameObject.SetActive(false);
         }
 
-        // Очищаем карточки
+        //  
         ClearCurrentCards();
 
-        // Уведомляем другие системы о завершении выбора
+        //      
         OnSelectionComplete();
     }
 
     /// <summary>
-    /// Корутина таймера выбора
+    ///   
     /// </summary>
     private IEnumerator SelectionTimerCoroutine()
     {
@@ -343,7 +400,7 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Автоматический выбор случайной карты при таймауте
+    ///      
     /// </summary>
     private void AutoSelectCard()
     {
@@ -359,7 +416,7 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Обновляет текст таймера
+    ///   
     /// </summary>
     private void UpdateLevelUpText()
     {
@@ -377,7 +434,7 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Обновляет визуальное отображение таймера
+    ///    
     /// </summary>
     private void UpdateSelectionTimer()
     {
@@ -388,27 +445,27 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Воспроизводит эффект выбора карты
+    ///    
     /// </summary>
     private void PlaySelectionEffect()
     {
-        // Здесь можно добавить звук, частицы и т.д.
+        //    ,   ..
         // Debug.Log("Card selected: " + selectedCard.cardName);
     }
 
     /// <summary>
-    /// Вызывается после завершения выбора
+    ///    
     /// </summary>
     private void OnSelectionComplete()
     {
         if (PlayerStats.Instance.exp > PlayerStats.Instance.maxExp)
             PlayerStats.Instance.LevelUp();
-        // Уведомляем другие системы
+        //   
         // Debug.Log("Card selection completed");
     }
 
     /// <summary>
-    /// Принудительно закрывает выбор карточек
+    ///    
     /// </summary>
     public void ForceCloseSelection()
     {
@@ -416,7 +473,7 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Проверяет, активно ли сейчас окно выбора
+    /// ,     
     /// </summary>
     public bool IsSelecting()
     {
@@ -424,7 +481,7 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Устанавливает время для выбора
+    ///    
     /// </summary>
     public void SetSelectionTime(float time)
     {
@@ -432,7 +489,7 @@ public class CardSelectionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Устанавливает количество показываемых карточек
+    ///    
     /// </summary>
     public void SetCardsToShow(int count)
     {

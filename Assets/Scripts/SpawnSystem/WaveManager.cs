@@ -6,14 +6,14 @@ public class WaveManager : MonoBehaviour
 {
     public static WaveManager Instance;
 
-    [Header("Ññûëêè")]
+    [Header("˜˜˜˜˜˜")]
     public WaveSequenceSO currentWaveSequence;
 
-    [Header("Íàñòğîéêè ïóëèíãà")]
+    [Header("˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜")]
     [SerializeField] private bool useObjectPooling = true;
     [SerializeField] private int prewarmEnemiesCount = 20;
 
-    [Header("Òåêóùåå ñîñòîÿíèå")]
+    [Header("˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜")]
     public int currentWaveIndex = 0;
     public int currentWaveNumber = 1;
     public bool isWaveActive = false;
@@ -21,6 +21,7 @@ public class WaveManager : MonoBehaviour
     public int totalWavesCompleted = 0;
 
     private List<GameObject> activeEnemies = new List<GameObject>();
+    private int _simulatedActive;
     private Dictionary<GameObject, Queue<GameObject>> enemyPools = new Dictionary<GameObject, Queue<GameObject>>();
     private Coroutine waveCoroutine;
     private bool isPlayerAlive = true;
@@ -43,16 +44,22 @@ public class WaveManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // Ïîäïèñûâàåìñÿ íà ñîáûòèÿ èãğîêà
         PlayerStats.OnPlayerSpawned += OnPlayerSpawned;
         PlayerStats.OnPlayerDeath += OnPlayerDeath;
+        Vampiric.Game.SimulationDriver.EnemyKilled += OnSimEnemyKilled;
     }
 
     private void OnDisable()
     {
-        // Îòïèñûâàåìñÿ îò ñîáûòèé
         PlayerStats.OnPlayerSpawned -= OnPlayerSpawned;
         PlayerStats.OnPlayerDeath -= OnPlayerDeath;
+        Vampiric.Game.SimulationDriver.EnemyKilled -= OnSimEnemyKilled;
+    }
+
+    private void OnSimEnemyKilled()
+    {
+        enemiesRemaining = Mathf.Max(0, enemiesRemaining - 1);
+        _simulatedActive = Mathf.Max(0, _simulatedActive - 1);
     }
 
     private void Start()
@@ -112,14 +119,14 @@ public class WaveManager : MonoBehaviour
         isPlayerAlive = false;
         playerTransform = null;
 
-        // Îñòàíàâëèâàåì òåêóùóş âîëíó
+        // ˜˜˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜ ˜˜˜˜˜
         if (waveCoroutine != null)
         {
             StopCoroutine(waveCoroutine);
             waveCoroutine = null;
         }
 
-        // Î÷èùàåì âñåõ âğàãîâ
+        // ˜˜˜˜˜˜˜ ˜˜˜˜ ˜˜˜˜˜˜
         ClearAllEnemies();
 
         Debug.Log("WaveManager paused due to player death");
@@ -173,7 +180,7 @@ public class WaveManager : MonoBehaviour
     {
         while (true)
         {
-            // Æäåì, ïîêà èãğîê áóäåò äîñòóïåí
+            // ˜˜˜˜, ˜˜˜˜ ˜˜˜˜˜ ˜˜˜˜˜ ˜˜˜˜˜˜˜˜
             if (!isPlayerAlive || playerTransform == null)
             {
                 yield return new WaitForSeconds(1f);
@@ -190,7 +197,7 @@ public class WaveManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Âñå âîëíû çàâåğøåíû!");
+                Debug.Log("˜˜˜ ˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜!");
                 yield return new WaitForSeconds(5f);
                 ResetWaveManager();
             }
@@ -209,7 +216,7 @@ public class WaveManager : MonoBehaviour
         var waveConfig = waveStage.waveConfig;
 
         isWaveActive = true;
-        Debug.Log($"Íà÷èíàåòñÿ âîëíà {currentWaveNumber}: {waveConfig.waveName}");
+        Debug.Log($"˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜ {currentWaveNumber}: {waveConfig.waveName}");
 
         PlayWaveStartEffects(waveConfig);
 
@@ -247,7 +254,7 @@ public class WaveManager : MonoBehaviour
         }
 
         isWaveActive = true;
-        Debug.Log($"Áåñêîíå÷íàÿ âîëíà {currentWaveNumber}: {waveConfig.waveName}");
+        Debug.Log($"˜˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜ {currentWaveNumber}: {waveConfig.waveName}");
 
         PlayWaveStartEffects(waveConfig);
 
@@ -272,23 +279,23 @@ public class WaveManager : MonoBehaviour
     {
         for (int i = 0; i < enemyCount; i++)
         {
-            // Ïğîâåğÿåì, æèâ ëè èãğîê ïåğåä ñïàâíîì
+            // ˜˜˜˜˜˜˜˜˜, ˜˜˜ ˜˜ ˜˜˜˜˜ ˜˜˜˜˜ ˜˜˜˜˜˜˜
             if (!isPlayerAlive)
             {
                 yield break;
             }
 
-            // Îáíîâëÿåì ïîçèöèş èãğîêà
+            // ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜ ˜˜˜˜˜˜
             if (playerTransform != null)
             {
                 lastKnownPlayerPosition = playerTransform.position;
             }
 
-            // Ëèìèò àêòèâíûõ âğàãîâ
-            if (activeEnemies.Count >= currentWaveSequence.maxActiveEnemies)
+            // ˜˜˜˜˜ ˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜
+            if (activeEnemies.Count + _simulatedActive >= currentWaveSequence.maxActiveEnemies)
             {
                 yield return new WaitUntil(() =>
-                    activeEnemies.Count < currentWaveSequence.maxActiveEnemies ||
+                    activeEnemies.Count + _simulatedActive < currentWaveSequence.maxActiveEnemies ||
                     !isPlayerAlive
                 );
             }
@@ -314,7 +321,7 @@ public class WaveManager : MonoBehaviour
 
         Vector3 spawnPosition = GetSpawnPosition(waveConfig);
 
-        // İôôåêò ñïàâíà
+        // ˜˜˜˜˜˜ ˜˜˜˜˜˜
         if (waveConfig.spawnEffect != null)
         {
             Instantiate(waveConfig.spawnEffect, spawnPosition, Quaternion.identity);
@@ -324,6 +331,20 @@ public class WaveManager : MonoBehaviour
         if (enemyPrefab == null)
         {
             Debug.LogError("Enemy prefab is null!");
+            return;
+        }
+
+        if (Vampiric.Game.SimulationDriver.Instance != null)
+        {
+            float healthMul = waveConfig.healthMultiplier;
+            float damageMul = waveConfig.damageMultiplier;
+            Vampiric.Game.SimulationDriver.Instance.SpawnEnemy(
+                enemyPrefab,
+                spawnPosition,
+                healthMul,
+                damageMul,
+                waveConfig.defenseBonus);
+            _simulatedActive++;
             return;
         }
 
@@ -358,7 +379,7 @@ public class WaveManager : MonoBehaviour
             }
         }
 
-        // Ğåçåğâíîå ñîçäàíèå åñëè ïóë ïóñò èëè îòêëş÷åí
+        // ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜ ˜˜˜˜ ˜˜˜ ˜˜˜˜ ˜˜˜ ˜˜˜˜˜˜˜˜
         return Instantiate(enemyPrefab, position, Quaternion.identity);
     }
 
@@ -368,12 +389,12 @@ public class WaveManager : MonoBehaviour
 
         if (waveConfig.spawnAroundPlayer && isPlayerAlive)
         {
-            // Èñïîëüçóåì ïîñëåäíşş èçâåñòíóş ïîçèöèş èãğîêà
+            // ˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜ ˜˜˜˜˜˜
             spawnCenter = lastKnownPlayerPosition;
         }
         else
         {
-            // Ñïàâí âîêğóã ìåíåäæåğà âîëí
+            // ˜˜˜˜˜ ˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜ ˜˜˜˜
             spawnCenter = transform.position;
         }
 
@@ -397,7 +418,7 @@ public class WaveManager : MonoBehaviour
                 enemyLevel
             );
 
-            // Ïğèìåíÿåì ìîäèôèêàòîğû
+            // ˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜˜˜˜˜
             //enemyStats.SetSpeedMultiplier(waveConfig.speedMultiplier);
             enemyStats.health *= waveConfig.healthMultiplier;
             enemyStats.damage *= waveConfig.damageMultiplier;
@@ -423,7 +444,7 @@ public class WaveManager : MonoBehaviour
 
         ReturnEnemyToPool(enemy);
 
-        // Ñòàòèñòèêà óáèéñòâ
+        // ˜˜˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜
         if (PlayerStats.Instance != null && isPlayerAlive)
         {
             PlayerStats.Instance.AddKill();
@@ -446,7 +467,7 @@ public class WaveManager : MonoBehaviour
             }
         }
 
-        // Åñëè ïóëèíã îòêëş÷åí èëè íå óäàëîñü âåğíóòü â ïóë - óíè÷òîæàåì
+        // ˜˜˜˜ ˜˜˜˜˜˜ ˜˜˜˜˜˜˜˜ ˜˜˜ ˜˜ ˜˜˜˜˜˜˜ ˜˜˜˜˜˜˜ ˜ ˜˜˜ - ˜˜˜˜˜˜˜˜˜˜
         Destroy(enemy);
     }
 
@@ -471,7 +492,7 @@ public class WaveManager : MonoBehaviour
         totalWavesCompleted++;
 
         GiveWaveRewards(waveConfig);
-        Debug.Log($"Âîëíà {currentWaveNumber} çàâåğøåíà!");
+        Debug.Log($"˜˜˜˜˜ {currentWaveNumber} ˜˜˜˜˜˜˜˜˜!");
 
         currentWaveIndex++;
         currentWaveNumber++;

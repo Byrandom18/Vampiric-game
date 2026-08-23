@@ -247,18 +247,4 @@ public class ConeScript : WeaponBase
         ResetTemporaryMultipliers();
     }
 
-    // Для дебаггинга
-    private void OnGUI()
-    {
-        if (Debug.isDebugBuild && isActive)
-        {
-            GUI.Label(new Rect(10, 100, 300, 200),
-                     $"Cone Stats:\n" +
-                     $"Damage: {currentDamage}\n" +
-                     $"Speed: {currentSpeed}\n" +
-                     $"Count: {currentCount}\n" +
-                     $"Interval: {currentShootInterval}\n" +
-                     $"Active: {isActive}");
-        }
-    }
 }

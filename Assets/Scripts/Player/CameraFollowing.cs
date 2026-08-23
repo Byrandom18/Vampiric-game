@@ -1,24 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraFollowing : MonoBehaviour
 {
-    private Transform player;
+    [SerializeField] private Transform _player;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        if (_player == null)
+        {
+            var playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
+            {
+                _player = playerObject.transform;
+            }
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void LateUpdate()
     {
-        Vector3 temp = transform.position;
-        temp.x = player.position.x;
-        temp.y = player.position.y;
+        if (_player == null)
+        {
+            return;
+        }
 
-        transform.position = temp;
+        Vector3 position = transform.position;
+        position.x = _player.position.x;
+        position.y = _player.position.y;
+        transform.position = position;
     }
 }

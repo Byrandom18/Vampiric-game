@@ -49,8 +49,14 @@ public class CardData : ScriptableObject
     public float statValue = 0f;
 
     [Header("Requirements")]
-    public int requiredLevel = 1; // днаюбэре щрс ярпнйс
+    public int requiredLevel = 1;
     public CardData[] requiredCards;
+
+    [Header("Evolution")]
+    public bool isEvolution;
+    public int resultWeaponId;
+    public int firstWeaponId;
+    public int secondWeaponId;
 
     public string GetDescription(int currentLevel)
     {
